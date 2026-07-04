@@ -1,0 +1,24 @@
+services:
+  # Produção: build + Nginx — http://localhost:8080
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+  # Desenvolvimento com HMR — http://localhost:5173
+  # Uso: docker compose --profile dev up dev
+  dev:
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "npm ci && npm run dev -- --host"
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    profiles:
+      - dev
+
+volumes:
+  node_modules:
