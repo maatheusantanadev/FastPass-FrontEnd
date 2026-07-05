@@ -1,3 +1,4 @@
+import { useParams } from "react-router-dom";
 import { Pencil, UserPlus, Users, CheckCircle2, Wallet } from "lucide-react";
 import DashboardShell from "../../components/DashboardShell.jsx";
 import KPI from "../../components/KPI.jsx";
@@ -11,7 +12,8 @@ import { excursaoPorId } from "../../data/excursoes.js";
 import { formatBRL } from "../../utils/format.js";
 
 export default function ExcursoesScreen() {
-  const excursao = excursaoPorId("praia-do-forte");
+  const { id } = useParams();
+  const excursao = excursaoPorId(id);
   const confirmados = passageiros.filter((p) => p.pagamento === "pago").length;
   const aReceber = passageiros.filter((p) => p.pagamento === "pendente").length * excursao.preco;
 

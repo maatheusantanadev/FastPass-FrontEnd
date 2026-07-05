@@ -20,7 +20,11 @@ function ViagemCard({ viagem, proxima }) {
   const info = statusBadge[viagem.status];
   return (
     <div className="overflow-hidden rounded-[20px] border border-line bg-white shadow-card">
-      <div className="flex gap-3 p-3">
+      <button
+        type="button"
+        onClick={() => navigate(`/app/viagem/${viagem.id}`)}
+        className="flex w-full gap-3 p-3 text-left transition-colors active:bg-cobalt-tint/30"
+      >
         <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl">
           <Scene variant={viagem.cena} />
         </div>
@@ -43,7 +47,7 @@ function ViagemCard({ viagem, proxima }) {
             </span>
           </div>
         </div>
-      </div>
+      </button>
       {proxima && (
         <div className="border-t border-line p-3">
           <Button
