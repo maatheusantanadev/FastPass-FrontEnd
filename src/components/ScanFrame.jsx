@@ -1,13 +1,15 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { ScanFace } from "lucide-react";
 
-// Viewport de câmera MOCKADO (sem getUserMedia). Toque simula a leitura.
+// Viewport de câmera. Se `videoRef` for passado (variante facial), exibe o
+// feed real da câmera; sem ele, mostra o placeholder e o toque simula a leitura.
 // variant: "facial" (moldura circular) | "qr" (retículo quadrado).
 export default function ScanFrame({
   variant = "facial",
   onCapture,
   scanning = true,
   size = 260,
+  videoRef,
 }) {
   const reduce = useReducedMotion();
   const isFacial = variant === "facial";
@@ -54,12 +56,22 @@ export default function ScanFrame({
           className="relative flex items-center justify-center overflow-hidden rounded-full border-2 border-white/70"
           style={{ width: size - 24, height: size - 24 }}
         >
-          <ScanFace
-            size={size * 0.5}
-            strokeWidth={1}
-            className="text-white/25"
-            aria-hidden="true"
-          />
+          {videoRef ? (
+            <video
+              ref={videoRef}
+              autoPlay
+              muted
+              playsInline
+              className="h-full w-full scale-x-[-1] object-cover"
+            />
+          ) : (
+            <ScanFace
+              size={size * 0.5}
+              strokeWidth={1}
+              className="text-white/25"
+              aria-hidden="true"
+            />
+          )}
           {scanning && (
             <motion.span
               className="absolute left-4 right-4 h-0.5 rounded bg-cobalt-soft shadow-[0_0_12px_2px_rgba(201,212,255,0.6)]"

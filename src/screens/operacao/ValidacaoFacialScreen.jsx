@@ -3,24 +3,58 @@ import { useNavigate } from "react-router-dom";
 import CameraLayout from "../../components/CameraLayout.jsx";
 import ScanFrame from "../../components/ScanFrame.jsx";
 import { useOperacao } from "../../context/OperacaoContext.jsx";
+import { useCamera } from "../../hooks/useCamera.js";
+import { embarcarPorFacial } from "../../api/embarque.js";
 
 export default function ValidacaoFacialScreen() {
   const navigate = useNavigate();
-  const { total, contagem, embarcar } = useOperacao();
+  const { total, contagem, embarcar, excursaoId } = useOperacao();
+  const { videoRef, iniciar, parar, capturar, disponivel } = useCamera({
+    facingMode: "environment",
+  });
   const [lendo, setLendo] = useState(false);
   const timer = useRef(null);
 
-  useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(() => {
+    iniciar();
+    return () => {
+      clearTimeout(timer.current);
+      parar();
+    };
+  }, [iniciar, parar]);
 
-  function simularLeitura() {
+  async function ler() {
     if (lendo) return;
     setLendo(true);
-    timer.current = setTimeout(() => {
-      const p = embarcar("facial");
-      navigate("/operacao/aprovado", { replace: false });
+
+    const imagem = disponivel ? capturar() : null;
+
+    // Sem câmera ou sem excursão real selecionada: modo simulado.
+    if (!imagem || !excursaoId) {
+      timer.current = setTimeout(() => {
+        embarcar("facial");
+        setLendo(false);
+        navigate("/operacao/aprovado");
+      }, 1600);
+      return;
+    }
+
+    try {
+      await embarcarPorFacial(excursaoId, imagem); // POST /embarque/facial
+      embarcar("facial"); // avança o contador local
+      parar();
+      navigate("/operacao/aprovado");
+    } catch (err) {
+      if (err.offline) {
+        embarcar("facial");
+        navigate("/operacao/aprovado");
+      } else {
+        // Passageiro não reconhecido (404) ou outro erro.
+        navigate("/operacao/nao-identificado");
+      }
+    } finally {
       setLendo(false);
-      if (!p) return;
-    }, 1600);
+    }
   }
 
   return (
@@ -43,7 +77,7 @@ export default function ValidacaoFacialScreen() {
         </button>
       }
     >
-      <ScanFrame variant="facial" scanning onCapture={simularLeitura} size={272} />
+      <ScanFrame variant="facial" scanning onCapture={ler} size={272} videoRef={videoRef} />
     </CameraLayout>
   );
 }

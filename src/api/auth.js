@@ -28,6 +28,14 @@ export function me() {
   return api("/auth/me");
 }
 
+// POST /auth/facial — cadastra a biometria facial do usuário (imagem base64)
+export function registrarFacial(imagemBase64) {
+  return api("/auth/facial", {
+    method: "POST",
+    body: { imagem: imagemBase64 },
+  });
+}
+
 // POST /auth/logout — encerra a sessão e descarta o token local
 export async function logout() {
   try {

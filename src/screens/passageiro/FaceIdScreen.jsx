@@ -4,17 +4,47 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Check } from "lucide-react";
 import ScanFrame from "../../components/ScanFrame.jsx";
 import Button from "../../components/Button.jsx";
+import { useCamera } from "../../hooks/useCamera.js";
+import { registrarFacial } from "../../api/auth.js";
 
 export default function FaceIdScreen() {
   const navigate = useNavigate();
+  const { videoRef, iniciar, parar, capturar, disponivel } = useCamera();
   const [fase, setFase] = useState("idle"); // idle | scan | done
   const timer = useRef(null);
 
-  useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(() => {
+    iniciar();
+    return () => {
+      clearTimeout(timer.current);
+      parar();
+    };
+  }, [iniciar, parar]);
 
-  function cadastrar() {
+  async function cadastrar() {
+    if (fase !== "idle") return;
     setFase("scan");
-    timer.current = setTimeout(() => setFase("done"), 2200);
+
+    const imagem = disponivel ? capturar() : null;
+
+    try {
+      if (imagem) {
+        await registrarFacial(imagem); // POST /auth/facial (via Laravel)
+      } else {
+        // Sem câmera: simula o tempo de leitura (modo demonstração).
+        await new Promise((r) => (timer.current = setTimeout(r, 1600)));
+      }
+      parar();
+      setFase("done");
+    } catch (err) {
+      // Backend offline: segue como cadastrado (demonstração).
+      if (err.offline) {
+        parar();
+        setFase("done");
+        return;
+      }
+      setFase("idle"); // erro real: permite tentar de novo
+    }
   }
 
   useEffect(() => {
@@ -22,6 +52,11 @@ export default function FaceIdScreen() {
       timer.current = setTimeout(() => navigate("/qr"), 1200);
     }
   }, [fase, navigate]);
+
+  function pular() {
+    parar();
+    navigate("/qr");
+  }
 
   return (
     <div className="flex min-h-[100dvh] flex-col items-center bg-cobalt px-6 pt-[max(2rem,env(safe-area-inset-top))] pb-[max(1.75rem,env(safe-area-inset-bottom))] text-white sm:mx-auto sm:my-6 sm:min-h-[calc(100dvh-3rem)] sm:max-h-[924px] sm:w-[430px] sm:rounded-[34px] sm:shadow-phone">
@@ -50,6 +85,7 @@ export default function FaceIdScreen() {
                 variant="facial"
                 scanning={fase === "scan"}
                 onCapture={fase === "idle" ? cadastrar : undefined}
+                videoRef={videoRef}
               />
             </motion.div>
           )}
@@ -78,7 +114,7 @@ export default function FaceIdScreen() {
         </Button>
         <button
           type="button"
-          onClick={() => navigate("/qr")}
+          onClick={pular}
           className="tap-target text-[14px] font-medium text-white/80 hover:text-white"
         >
           Pular e usar QR Code

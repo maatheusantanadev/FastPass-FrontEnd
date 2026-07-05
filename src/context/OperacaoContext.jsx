@@ -14,6 +14,7 @@ function agora() {
 export function OperacaoProvider({ children }) {
   const [lista, setLista] = useState(() => base.map((p) => ({ ...p })));
   const [ultimo, setUltimo] = useState(null);
+  const [excursaoId, setExcursaoId] = useState(null); // excursão real em operação
 
   const contagem = useMemo(() => contarStatus(lista), [lista]);
   const total = lista.length;
@@ -44,6 +45,8 @@ export function OperacaoProvider({ children }) {
     total,
     contagem,
     ultimo,
+    excursaoId,
+    setExcursaoId,
     proximoPendente,
     embarcar,
     reiniciar,

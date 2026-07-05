@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bus, Clock, Users, ScanFace, ClipboardCheck } from "lucide-react";
 import MobileShell from "../../components/MobileShell.jsx";
@@ -7,10 +8,28 @@ import Scene from "../../components/Scene.jsx";
 import Button from "../../components/Button.jsx";
 import { useOperacao } from "../../context/OperacaoContext.jsx";
 import { resumoOperacao } from "../../data/passageiros.js";
+import { listarExcursoes } from "../../api/excursoes.js";
 
 export default function OperacaoScreen() {
   const navigate = useNavigate();
-  const { total, contagem } = useOperacao();
+  const { total, contagem, excursaoId, setExcursaoId } = useOperacao();
+
+  // Define a excursão real em operação (primeira disponível) para que a
+  // validação facial tenha um alvo no backend. Sem backend, segue simulado.
+  useEffect(() => {
+    if (excursaoId) return;
+    let vivo = true;
+    listarExcursoes()
+      .then((lista) => {
+        if (vivo && Array.isArray(lista) && lista.length) {
+          setExcursaoId(lista[0].id);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      vivo = false;
+    };
+  }, [excursaoId, setExcursaoId]);
 
   return (
     <MobileShell
