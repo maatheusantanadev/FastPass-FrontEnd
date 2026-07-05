@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Mail, Lock, ScanFace } from "lucide-react";
 import BrandPanel from "../components/BrandPanel.jsx";
@@ -9,10 +9,10 @@ import Button from "../components/Button.jsx";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function LoginScreen() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-  const [success, setSuccess] = useState(false);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -26,7 +26,7 @@ export default function LoginScreen() {
     }
 
     setErrors(nextErrors);
-    setSuccess(Object.keys(nextErrors).length === 0);
+    if (Object.keys(nextErrors).length === 0) navigate("/app/explorar");
   }
 
   return (
@@ -72,19 +72,13 @@ export default function LoginScreen() {
             />
             <div className="mt-2 flex justify-end">
               <Link
-                to="#"
+                to="/recuperar-senha"
                 className="tap-target flex items-center font-body text-[13px] font-medium text-cobalt hover:text-cobalt-dark"
               >
                 Esqueci minha senha
               </Link>
             </div>
           </div>
-
-          {success && (
-            <p className="font-body text-[13px] font-medium text-success" role="status">
-              Tudo certo — login validado.
-            </p>
-          )}
 
           <Button type="submit" variant="primary" fullWidth>
             Entrar
@@ -97,7 +91,12 @@ export default function LoginScreen() {
           <div className="h-px flex-1 bg-line" />
         </div>
 
-        <Button variant="soft" icon={ScanFace} fullWidth>
+        <Button
+          variant="soft"
+          icon={ScanFace}
+          fullWidth
+          onClick={() => navigate("/app/explorar")}
+        >
           Entrar com Face ID
         </Button>
 

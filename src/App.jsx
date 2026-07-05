@@ -6,6 +6,7 @@ import SplashScreen from "./screens/SplashScreen.jsx";
 import WelcomeScreen from "./screens/WelcomeScreen.jsx";
 import LoginScreen from "./screens/LoginScreen.jsx";
 import SignupScreen from "./screens/SignupScreen.jsx";
+import RecuperarSenhaScreen from "./screens/RecuperarSenhaScreen.jsx";
 
 // Passageiro — onboarding e pós-cadastro
 import OnboardingScreen from "./screens/passageiro/OnboardingScreen.jsx";
@@ -58,6 +59,7 @@ export default function App() {
         <Route path="/boas-vindas" element={<WelcomeScreen />} />
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/cadastro" element={<SignupScreen />} />
+        <Route path="/recuperar-senha" element={<RecuperarSenhaScreen />} />
 
         {/* Passageiro — pós-cadastro */}
         <Route path="/termos" element={<TermosScreen />} />
