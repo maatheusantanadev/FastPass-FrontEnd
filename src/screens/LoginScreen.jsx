@@ -5,16 +5,19 @@ import { Mail, Lock, ScanFace } from "lucide-react";
 import BrandPanel from "../components/BrandPanel.jsx";
 import TextField from "../components/TextField.jsx";
 import Button from "../components/Button.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function LoginScreen() {
   const navigate = useNavigate();
+  const { entrar } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
+  const [enviando, setEnviando] = useState(false);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     const nextErrors = {};
 
@@ -26,7 +29,22 @@ export default function LoginScreen() {
     }
 
     setErrors(nextErrors);
-    if (Object.keys(nextErrors).length === 0) navigate("/app/explorar");
+    if (Object.keys(nextErrors).length > 0) return;
+
+    setEnviando(true);
+    try {
+      await entrar({ email, password });
+      navigate("/app/explorar");
+    } catch (err) {
+      // Backend fora do ar: segue em modo demonstração para não travar o app.
+      if (err.offline) {
+        navigate("/app/explorar");
+        return;
+      }
+      setErrors({ password: err.message || "Credenciais inválidas." });
+    } finally {
+      setEnviando(false);
+    }
   }
 
   return (
@@ -80,8 +98,8 @@ export default function LoginScreen() {
             </div>
           </div>
 
-          <Button type="submit" variant="primary" fullWidth>
-            Entrar
+          <Button type="submit" variant="primary" fullWidth disabled={enviando}>
+            {enviando ? "Entrando…" : "Entrar"}
           </Button>
         </form>
 

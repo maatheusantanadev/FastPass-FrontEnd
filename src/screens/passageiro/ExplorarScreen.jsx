@@ -1,12 +1,15 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Search } from "lucide-react";
 import MobileShell from "../../components/MobileShell.jsx";
 import TabBar from "../../components/TabBar.jsx";
 import Chip from "../../components/Chip.jsx";
 import Avatar from "../../components/Avatar.jsx";
 import ExcursionCard from "../../components/ExcursionCard.jsx";
-import { excursoes } from "../../data/excursoes.js";
+import { excursoes as excursoesMock } from "../../data/excursoes.js";
 import { usuario } from "../../data/passageiros.js";
+import { listarExcursoes } from "../../api/excursoes.js";
+import { excursaoDoBackend } from "../../api/adapters.js";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 const filtros = [
   { id: "todos", label: "Todos" },
@@ -17,8 +20,28 @@ const filtros = [
 ];
 
 export default function ExplorarScreen() {
+  const { usuario: authUser } = useAuth();
   const [filtro, setFiltro] = useState("todos");
   const [busca, setBusca] = useState("");
+  const [excursoes, setExcursoes] = useState(excursoesMock);
+
+  // Carrega o catálogo da API; mantém o mock se o backend estiver fora do ar.
+  useEffect(() => {
+    let vivo = true;
+    listarExcursoes()
+      .then((lista) => {
+        if (vivo && Array.isArray(lista) && lista.length) {
+          setExcursoes(lista.map(excursaoDoBackend));
+        }
+      })
+      .catch(() => {});
+    return () => {
+      vivo = false;
+    };
+  }, []);
+
+  const primeiroNome = authUser?.name?.trim().split(" ")[0] ?? usuario.nome;
+  const nomeCompleto = authUser?.name ?? usuario.nomeCompleto;
 
   const lista = useMemo(() => {
     return excursoes.filter((e) => {
@@ -30,7 +53,7 @@ export default function ExplorarScreen() {
       if (filtro === "ate200") return e.preco <= 200;
       return true;
     });
-  }, [filtro, busca]);
+  }, [filtro, busca, excursoes]);
 
   return (
     <MobileShell footer={<TabBar />}>
@@ -39,10 +62,10 @@ export default function ExplorarScreen() {
         <div className="flex-1">
           <p className="text-[13px] text-muted">Olá,</p>
           <h1 className="font-display text-[24px] font-medium leading-tight text-ink">
-            {usuario.nome}
+            {primeiroNome}
           </h1>
         </div>
-        <Avatar nome={usuario.nomeCompleto} size="lg" tone="solid" />
+        <Avatar nome={nomeCompleto} size="lg" tone="solid" />
       </div>
 
       {/* busca */}

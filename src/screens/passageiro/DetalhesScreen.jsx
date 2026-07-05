@@ -1,9 +1,12 @@
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, Bus, Clock, Users, Building2 } from "lucide-react";
 import Scene from "../../components/Scene.jsx";
 import Button from "../../components/Button.jsx";
 import { excursaoPorId } from "../../data/excursoes.js";
 import { usePedido } from "../../context/PedidoContext.jsx";
+import { obterExcursao } from "../../api/excursoes.js";
+import { excursaoDoBackend } from "../../api/adapters.js";
 import { formatBRL } from "../../utils/format.js";
 
 function Linha({ icon: Icon, label, valor }) {
@@ -22,7 +25,20 @@ export default function DetalhesScreen() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { setExcursao } = usePedido();
-  const excursao = excursaoPorId(id);
+  // Começa pelo mock (resposta imediata) e corrige com a API quando disponível.
+  const [excursao, setExcursaoLocal] = useState(() => excursaoPorId(id));
+
+  useEffect(() => {
+    let vivo = true;
+    obterExcursao(id)
+      .then((e) => {
+        if (vivo && e) setExcursaoLocal(excursaoDoBackend(e));
+      })
+      .catch(() => {});
+    return () => {
+      vivo = false;
+    };
+  }, [id]);
 
   function comprar() {
     setExcursao(excursao);

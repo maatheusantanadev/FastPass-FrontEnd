@@ -174,6 +174,35 @@ docker compose --profile dev up dev
 
 ---
 
+## Integração com a API
+
+A camada de acesso ao backend (Laravel) fica em **`src/api/`**:
+
+| Arquivo | Responsabilidade |
+| --- | --- |
+| `client.js` | wrapper de `fetch` — injeta o token Bearer, trata JSON e normaliza erros (`ApiError`); `status: 0` indica backend offline |
+| `auth.js` | `/auth/register`, `/login`, `/me`, `/logout` |
+| `excursoes.js` | `/excursoes`, detalhe, painel e conclusão |
+| `compras.js` | listar/criar passagens e registrar a biometria facial |
+| `embarque.js` | validação de embarque por facial e por QR Code |
+| `adapters.js` | traduz o JSON do backend para o formato das telas (datas formatadas, `vagas`/`total`, `cena`, etc.) |
+
+A sessão é gerida pelo **`AuthContext`** (token persistido em `localStorage`). O
+**Login** e o **Cadastro** já chamam a API real; **Explorar** e **Detalhes**
+carregam as excursões do backend.
+
+> **Degradação graciosa:** se o backend estiver fora do ar, o app cai
+> automaticamente em modo demonstração (dados mock de `src/data/`), sem quebrar
+> o fluxo — ideal para apresentações.
+
+Configure a URL da API copiando `.env.example` para `.env`:
+
+```bash
+cp .env.example .env   # VITE_API_URL=http://localhost:8000/api
+```
+
+---
+
 ## Mapa de rotas
 
 **Entrada** `/` · `/onboarding` · `/boas-vindas` · `/login` · `/cadastro` · `/recuperar-senha`

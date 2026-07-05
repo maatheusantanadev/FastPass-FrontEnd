@@ -6,6 +6,7 @@ import BrandPanel from "../components/BrandPanel.jsx";
 import TextField from "../components/TextField.jsx";
 import Button from "../components/Button.jsx";
 import { formatPhone, formatCPF, passwordStrength } from "../utils/masks.js";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -14,6 +15,7 @@ const strengthColors = ["bg-red-400", "bg-amber-400", "bg-amber-400", "bg-succes
 
 export default function SignupScreen() {
   const navigate = useNavigate();
+  const { cadastrar } = useAuth();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -23,6 +25,7 @@ export default function SignupScreen() {
   });
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
+  const [enviando, setEnviando] = useState(false);
 
   const strength = passwordStrength(form.password);
 
@@ -30,7 +33,7 @@ export default function SignupScreen() {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     const nextErrors = {};
 
@@ -46,14 +49,49 @@ export default function SignupScreen() {
     if (form.cpf.replace(/\D/g, "").length < 11) {
       nextErrors.cpf = "CPF incompleto.";
     }
-    if (form.password.length < 6) {
-      nextErrors.password = "Mínimo de 6 caracteres.";
+    // O backend exige no mínimo 8 caracteres.
+    if (form.password.length < 8) {
+      nextErrors.password = "Mínimo de 8 caracteres.";
     }
 
     setErrors(nextErrors);
-    const ok = Object.keys(nextErrors).length === 0;
-    setSuccess(ok);
-    if (ok) navigate("/termos");
+    if (Object.keys(nextErrors).length > 0) {
+      setSuccess(false);
+      return;
+    }
+
+    setEnviando(true);
+    try {
+      await cadastrar({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        password: form.password,
+        password_confirmation: form.password,
+        cpf: form.cpf,
+        telefone: form.phone,
+      });
+      setSuccess(true);
+      navigate("/termos");
+    } catch (err) {
+      // Backend fora do ar: segue em modo demonstração.
+      if (err.offline) {
+        setSuccess(true);
+        navigate("/termos");
+        return;
+      }
+      // Erros de validação vindos do Laravel (422): { campo: [mensagem] }.
+      const apiErrors = err.errors ?? {};
+      setErrors({
+        name: apiErrors.name?.[0],
+        email: apiErrors.email?.[0],
+        phone: apiErrors.telefone?.[0],
+        cpf: apiErrors.cpf?.[0],
+        password: apiErrors.password?.[0] ?? (err.status === 422 ? undefined : err.message),
+      });
+      setSuccess(false);
+    } finally {
+      setEnviando(false);
+    }
   }
 
   return (
@@ -158,8 +196,8 @@ export default function SignupScreen() {
             </p>
           )}
 
-          <Button type="submit" variant="primary" fullWidth>
-            Criar conta
+          <Button type="submit" variant="primary" fullWidth disabled={enviando}>
+            {enviando ? "Criando conta…" : "Criar conta"}
           </Button>
         </form>
 
