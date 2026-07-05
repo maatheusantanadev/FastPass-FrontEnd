@@ -87,7 +87,22 @@ export function compraParaViagem(c) {
     saida: comLocal(ex.data_saida, ex.ponto_partida),
     assento: "—",
     status: STATUS_VIAGEM[c.status] ?? "confirmada",
+    valor: Number(c.valor ?? 0),
     codigoQr: c.codigo_qr ?? null,
     raw: c,
   };
+}
+
+// Painel de gestão da excursão → linhas da tabela de passageiros (admin).
+// O backend expõe user {id, name, email} e o status da compra; não há
+// assento nem método de embarque persistido, então mapeamos o que existe.
+export function passageirosDoPainel(painel) {
+  return (painel?.lista_embarque ?? []).map((c) => ({
+    id: String(c.id),
+    nome: c.user?.name ?? "—",
+    sub: c.user?.email ?? "",
+    pagamento: c.status === "cancelada" ? "pendente" : "pago",
+    embarque: c.status === "embarcada" || c.status === "concluida",
+    metodo: null,
+  }));
 }

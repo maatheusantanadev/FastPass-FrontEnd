@@ -7,6 +7,7 @@ import PillTabs from "../../components/PillTabs.jsx";
 import QRCode from "../../components/QRCode.jsx";
 import Button from "../../components/Button.jsx";
 import { usePedido } from "../../context/PedidoContext.jsx";
+import { criarCompra } from "../../api/compras.js";
 import { formatBRL } from "../../utils/format.js";
 
 function formatCartao(v) {
@@ -31,10 +32,26 @@ function Campo({ label, className = "", ...props }) {
 
 export default function PagamentoScreen() {
   const navigate = useNavigate();
-  const { totais, excursao } = usePedido();
+  const { totais, excursao, setCompra } = usePedido();
   const [aba, setAba] = useState("cartao");
   const [cartao, setCartao] = useState({ numero: "", validade: "", cvv: "", nome: "" });
   const [segundos, setSegundos] = useState(14 * 60 + 59);
+  const [processando, setProcessando] = useState(false);
+
+  async function pagar() {
+    setProcessando(true);
+    try {
+      const excursaoId = excursao?.raw?.id ?? excursao?.id;
+      const data = await criarCompra(excursaoId);
+      if (data?.compra) setCompra(data.compra);
+      navigate("/app/confirmacao");
+    } catch {
+      // Backend offline / sem sessão: segue em modo demonstração.
+      navigate("/app/confirmacao");
+    } finally {
+      setProcessando(false);
+    }
+  }
 
   useEffect(() => {
     if (aba !== "pix") return;
@@ -59,9 +76,10 @@ export default function PagamentoScreen() {
           <Button
             variant="primary"
             className="flex-1"
-            onClick={() => navigate("/app/confirmacao")}
+            onClick={pagar}
+            disabled={processando}
           >
-            Pagar e confirmar
+            {processando ? "Processando…" : "Pagar e confirmar"}
           </Button>
         </div>
       }

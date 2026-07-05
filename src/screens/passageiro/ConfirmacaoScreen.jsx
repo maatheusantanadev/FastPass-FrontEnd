@@ -6,12 +6,18 @@ import SuccessCheck from "../../components/SuccessCheck.jsx";
 import QRCode from "../../components/QRCode.jsx";
 import Button from "../../components/Button.jsx";
 import { usePedido } from "../../context/PedidoContext.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
 import { usuario } from "../../data/passageiros.js";
 import { formatBRL } from "../../utils/format.js";
 
 export default function ConfirmacaoScreen() {
   const navigate = useNavigate();
-  const { excursao, assento, totais } = usePedido();
+  const { excursao, assento, totais, compra } = usePedido();
+  const { usuario: authUser } = useAuth();
+
+  const nome = authUser?.name ?? usuario.nomeCompleto;
+  const totalPago = compra ? Number(compra.valor) : totais.total;
+  const qrValue = compra?.codigo_qr ?? `FASTPASS|${usuario.codigoEmbarque}|${excursao.id}`;
 
   return (
     <MobileShell
@@ -43,7 +49,7 @@ export default function ConfirmacaoScreen() {
         <div className="mt-6 w-full rounded-2xl border border-line bg-cobalt-tint/30 p-4 text-left text-[14px]">
           <div className="flex justify-between py-1">
             <span className="text-muted">Passageiro</span>
-            <span className="font-medium text-ink">{usuario.nomeCompleto}</span>
+            <span className="font-medium text-ink">{nome}</span>
           </div>
           <div className="flex justify-between py-1">
             <span className="text-muted">Assento</span>
@@ -51,12 +57,12 @@ export default function ConfirmacaoScreen() {
           </div>
           <div className="flex justify-between py-1">
             <span className="text-muted">Total pago</span>
-            <span className="font-semibold text-ink">{formatBRL(totais.total)}</span>
+            <span className="font-semibold text-ink">{formatBRL(totalPago)}</span>
           </div>
         </div>
 
         <div className="mt-6">
-          <QRCode value={`FASTPASS|${usuario.codigoEmbarque}|${excursao.id}`} size={188} label="Bilhete de embarque" />
+          <QRCode value={qrValue} size={188} label="Bilhete de embarque" />
         </div>
       </div>
     </MobileShell>

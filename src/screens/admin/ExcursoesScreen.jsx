@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Pencil, UserPlus, Users, CheckCircle2, Wallet } from "lucide-react";
 import DashboardShell from "../../components/DashboardShell.jsx";
@@ -7,15 +8,49 @@ import Badge from "../../components/Badge.jsx";
 import MethodPill from "../../components/MethodPill.jsx";
 import Avatar from "../../components/Avatar.jsx";
 import Button from "../../components/Button.jsx";
-import { passageiros } from "../../data/passageiros.js";
+import { passageiros as passageirosMock } from "../../data/passageiros.js";
 import { excursaoPorId } from "../../data/excursoes.js";
+import { painelExcursao } from "../../api/excursoes.js";
+import { excursaoDoBackend, passageirosDoPainel } from "../../api/adapters.js";
 import { formatBRL } from "../../utils/format.js";
+
+// Normaliza a lista mock para o mesmo formato do adapter do painel.
+function normalizarMock(p) {
+  return {
+    id: p.id,
+    nome: p.nome,
+    sub: `CPF ${p.cpf}`,
+    pagamento: p.pagamento,
+    embarque: p.status === "embarcado",
+    metodo: p.metodo,
+  };
+}
 
 export default function ExcursoesScreen() {
   const { id } = useParams();
-  const excursao = excursaoPorId(id);
+  const [excursao, setExcursao] = useState(() => excursaoPorId(id));
+  const [passageiros, setPassageiros] = useState(() =>
+    passageirosMock.map(normalizarMock)
+  );
+
+  // Carrega o painel real; mantém o mock se o backend estiver offline.
+  useEffect(() => {
+    let vivo = true;
+    painelExcursao(id)
+      .then((p) => {
+        if (!vivo || !p) return;
+        if (p.excursao) setExcursao(excursaoDoBackend(p.excursao));
+        setPassageiros(passageirosDoPainel(p));
+      })
+      .catch(() => {});
+    return () => {
+      vivo = false;
+    };
+  }, [id]);
+
   const confirmados = passageiros.filter((p) => p.pagamento === "pago").length;
-  const aReceber = passageiros.filter((p) => p.pagamento === "pendente").length * excursao.preco;
+  const aReceber =
+    passageiros.filter((p) => p.pagamento === "pendente").length * excursao.preco;
 
   const columns = [
     {
@@ -26,12 +61,11 @@ export default function ExcursoesScreen() {
           <Avatar nome={p.nome} size="sm" />
           <div>
             <p className="font-medium text-ink">{p.nome}</p>
-            <p className="text-[12px] text-muted">CPF {p.cpf}</p>
+            <p className="text-[12px] text-muted">{p.sub}</p>
           </div>
         </div>
       ),
     },
-    { key: "assento", header: "Assento", render: (p) => <span className="font-medium">{p.assento}</span> },
     {
       key: "pagamento",
       header: "Pagamento",
@@ -43,10 +77,18 @@ export default function ExcursoesScreen() {
         ),
     },
     {
-      key: "metodo",
+      key: "embarque",
       header: "Embarque",
       render: (p) =>
-        p.metodo ? <MethodPill metodo={p.metodo} size="sm" /> : <span className="text-muted">—</span>,
+        p.embarque ? (
+          p.metodo ? (
+            <MethodPill metodo={p.metodo} size="sm" />
+          ) : (
+            <Badge tone="success">Embarcado</Badge>
+          )
+        ) : (
+          <span className="text-muted">—</span>
+        ),
     },
   ];
 

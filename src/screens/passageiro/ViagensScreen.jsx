@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Calendar, Bus, Armchair } from "lucide-react";
 import MobileShell from "../../components/MobileShell.jsx";
@@ -7,17 +7,20 @@ import PillTabs from "../../components/PillTabs.jsx";
 import Scene from "../../components/Scene.jsx";
 import Badge from "../../components/Badge.jsx";
 import Button from "../../components/Button.jsx";
-import { viagens } from "../../data/viagens.js";
+import { viagens as viagensMock } from "../../data/viagens.js";
+import { listarCompras } from "../../api/compras.js";
+import { compraParaViagem } from "../../api/adapters.js";
 
 const statusBadge = {
   confirmada: { tone: "success", label: "Confirmada" },
   aguardando: { tone: "warning", label: "Aguardando embarque" },
   concluida: { tone: "neutral", label: "Concluída" },
+  cancelada: { tone: "neutral", label: "Cancelada" },
 };
 
 function ViagemCard({ viagem, proxima }) {
   const navigate = useNavigate();
-  const info = statusBadge[viagem.status];
+  const info = statusBadge[viagem.status] ?? statusBadge.confirmada;
   return (
     <div className="overflow-hidden rounded-[20px] border border-line bg-white shadow-card">
       <button
@@ -65,6 +68,30 @@ function ViagemCard({ viagem, proxima }) {
 
 export default function ViagensScreen() {
   const [aba, setAba] = useState("proximas");
+  const [viagens, setViagens] = useState(viagensMock);
+
+  // Carrega as compras do passageiro; mantém o mock se o backend estiver offline.
+  useEffect(() => {
+    let vivo = true;
+    listarCompras()
+      .then((compras) => {
+        if (!vivo || !Array.isArray(compras)) return;
+        const mapeadas = compras.map(compraParaViagem);
+        setViagens({
+          proximas: mapeadas.filter(
+            (v) => v.status !== "concluida" && v.status !== "cancelada"
+          ),
+          anteriores: mapeadas.filter(
+            (v) => v.status === "concluida" || v.status === "cancelada"
+          ),
+        });
+      })
+      .catch(() => {});
+    return () => {
+      vivo = false;
+    };
+  }, []);
+
   const lista = aba === "proximas" ? viagens.proximas : viagens.anteriores;
 
   return (

@@ -9,6 +9,7 @@ export function PedidoProvider({ children }) {
   const [assento, setAssento] = useState(null);
   const [extras, setExtras] = useState([]);
   const [cupom, setCupom] = useState(null);
+  const [compra, setCompra] = useState(null); // compra criada no checkout (com codigo_qr)
 
   function toggleExtra(item) {
     setExtras((prev) =>
@@ -45,6 +46,8 @@ export function PedidoProvider({ children }) {
     cupom,
     aplicarCupom,
     setCupom,
+    compra,
+    setCompra,
     totais,
   };
 

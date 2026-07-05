@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, Calendar, Bus, Armchair, MapPin } from "lucide-react";
 import Scene from "../../components/Scene.jsx";
@@ -6,11 +7,14 @@ import QRCode from "../../components/QRCode.jsx";
 import Button from "../../components/Button.jsx";
 import { viagens } from "../../data/viagens.js";
 import { usuario } from "../../data/passageiros.js";
+import { obterCompra } from "../../api/compras.js";
+import { compraParaViagem } from "../../api/adapters.js";
 
 const statusBadge = {
   confirmada: { tone: "success", label: "Confirmada" },
   aguardando: { tone: "warning", label: "Aguardando embarque" },
   concluida: { tone: "neutral", label: "Concluída" },
+  cancelada: { tone: "neutral", label: "Cancelada" },
 };
 
 function todas() {
@@ -20,9 +24,26 @@ function todas() {
 export default function ViagemDetalheScreen() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const viagem = todas().find((v) => v.id === id) ?? viagens.proximas[0];
-  const info = statusBadge[viagem.status];
-  const proxima = viagem.status !== "concluida";
+  const [viagem, setViagem] = useState(
+    () => todas().find((v) => v.id === id) ?? viagens.proximas[0]
+  );
+
+  // Busca o bilhete real; mantém o mock se o backend estiver offline.
+  useEffect(() => {
+    let vivo = true;
+    obterCompra(id)
+      .then((c) => {
+        if (vivo && c) setViagem(compraParaViagem(c));
+      })
+      .catch(() => {});
+    return () => {
+      vivo = false;
+    };
+  }, [id]);
+
+  const info = statusBadge[viagem.status] ?? statusBadge.confirmada;
+  const proxima = viagem.status !== "concluida" && viagem.status !== "cancelada";
+  const qrValue = viagem.codigoQr ?? `FASTPASS|${usuario.codigoEmbarque}|${viagem.id}`;
 
   return (
     <div className="flex min-h-[100dvh] flex-col bg-white sm:mx-auto sm:my-6 sm:min-h-[calc(100dvh-3rem)] sm:max-h-[924px] sm:w-[430px] sm:overflow-hidden sm:rounded-[34px] sm:shadow-phone">
@@ -78,7 +99,7 @@ export default function ViagemDetalheScreen() {
           {/* bilhete */}
           <div className="mt-5 flex flex-col items-center rounded-2xl border border-dashed border-cobalt-soft bg-cobalt-tint/30 py-6">
             <QRCode
-              value={`FASTPASS|${usuario.codigoEmbarque}|${viagem.id}`}
+              value={qrValue}
               size={172}
               label="Bilhete de embarque"
             />
