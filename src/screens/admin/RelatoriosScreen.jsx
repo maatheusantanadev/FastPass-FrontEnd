@@ -1,9 +1,15 @@
+import { useEffect, useState } from "react";
 import { Download, UserCheck, Clock, TrendingUp, CalendarDays } from "lucide-react";
 import DashboardShell from "../../components/DashboardShell.jsx";
 import KPI from "../../components/KPI.jsx";
 import DataTable from "../../components/DataTable.jsx";
 import Button from "../../components/Button.jsx";
-import { historicoViagens, kpisRelatorios } from "../../data/relatorios.js";
+import {
+  historicoViagens as historicoMock,
+  kpisRelatorios as kpisMock,
+} from "../../data/relatorios.js";
+import { obterDashboard } from "../../api/dashboard.js";
+import { dashboardDoBackend } from "../../api/adapters.js";
 import { formatBRL, pct } from "../../utils/format.js";
 
 function BarraMini({ valor }) {
@@ -18,7 +24,24 @@ function BarraMini({ valor }) {
 }
 
 export default function RelatoriosScreen() {
-  const k = kpisRelatorios;
+  const [k, setK] = useState(kpisMock);
+  const [historicoViagens, setHistorico] = useState(historicoMock);
+
+  // Carrega os relatórios reais; mantém o mock se o backend estiver offline.
+  useEffect(() => {
+    let vivo = true;
+    obterDashboard()
+      .then((d) => {
+        if (!vivo || !d) return;
+        const dash = dashboardDoBackend(d);
+        setK(dash.kpisRelatorios);
+        setHistorico(dash.historicoViagens);
+      })
+      .catch(() => {});
+    return () => {
+      vivo = false;
+    };
+  }, []);
 
   const columns = [
     { key: "destino", header: "Viagem", render: (v) => <span className="font-medium text-ink">{v.destino}</span> },

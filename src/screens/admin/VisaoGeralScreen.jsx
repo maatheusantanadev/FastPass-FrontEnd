@@ -1,15 +1,37 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Users, CheckCircle2, Wallet, TrendingUp, Radio, ArrowRight } from "lucide-react";
 import DashboardShell from "../../components/DashboardShell.jsx";
 import KPI from "../../components/KPI.jsx";
 import BarChart from "../../components/BarChart.jsx";
 import Donut from "../../components/Donut.jsx";
-import { vendasPorDia, kpisVisaoGeral } from "../../data/relatorios.js";
+import { vendasPorDia as vendasMock, kpisVisaoGeral as kpisMock } from "../../data/relatorios.js";
+import { obterDashboard } from "../../api/dashboard.js";
+import { dashboardDoBackend } from "../../api/adapters.js";
 import { formatBRL, pct } from "../../utils/format.js";
 
 export default function VisaoGeralScreen() {
   const navigate = useNavigate();
-  const k = kpisVisaoGeral;
+  const [k, setK] = useState(kpisMock);
+  const [vendasPorDia, setVendas] = useState(vendasMock);
+  const [excursaoAtual, setExcursaoAtual] = useState("Praia do Forte");
+
+  // Carrega as métricas reais; mantém o mock se o backend estiver offline.
+  useEffect(() => {
+    let vivo = true;
+    obterDashboard()
+      .then((d) => {
+        if (!vivo || !d) return;
+        const dash = dashboardDoBackend(d);
+        setK(dash.kpisVisaoGeral);
+        if (dash.vendasPorDia.length) setVendas(dash.vendasPorDia);
+        if (dash.excursaoAtual) setExcursaoAtual(dash.excursaoAtual);
+      })
+      .catch(() => {});
+    return () => {
+      vivo = false;
+    };
+  }, []);
 
   return (
     <DashboardShell title="Visão geral" subtitle="Bahia Sol Turismo · julho">
@@ -28,7 +50,7 @@ export default function VisaoGeralScreen() {
             <Radio size={18} /> Embarque em andamento
           </p>
           <p className="text-[13px] text-white/70">
-            Praia do Forte · acompanhe a validação em tempo real
+            {excursaoAtual} · acompanhe a validação em tempo real
           </p>
         </div>
         <ArrowRight size={20} />
@@ -55,7 +77,7 @@ export default function VisaoGeralScreen() {
           <h2 className="mb-4 self-start font-display text-[17px] font-medium text-ink">
             Ocupação
           </h2>
-          <Donut value={k.vagasOcupadas / k.capacidade} caption="ocupadas" />
+          <Donut value={k.capacidade ? k.vagasOcupadas / k.capacidade : 0} caption="ocupadas" />
           <p className="mt-4 text-[13px] text-muted">
             {k.vagasOcupadas} de {k.capacidade} poltronas
           </p>

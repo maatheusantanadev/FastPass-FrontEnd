@@ -103,6 +103,39 @@ export function passageirosDoPainel(painel) {
     sub: c.user?.email ?? "",
     pagamento: c.status === "cancelada" ? "pendente" : "pago",
     embarque: c.status === "embarcada" || c.status === "concluida",
-    metodo: null,
+    metodo: c.metodo_embarque ?? null,
   }));
+}
+
+// GET /dashboard → shapes usados pelo painel (Visão geral e Relatórios).
+export function dashboardDoBackend(d) {
+  if (!d) return null;
+  const vg = d.visao_geral ?? {};
+  const rel = d.relatorios ?? {};
+  return {
+    excursaoAtual: vg.excursao_atual ?? null,
+    kpisVisaoGeral: {
+      vagasOcupadas: vg.vagas_ocupadas ?? 0,
+      capacidade: vg.capacidade ?? 0,
+      confirmados: vg.confirmados ?? 0,
+      pagamentos: Number(vg.pagamentos ?? 0),
+      ocupacaoMedia: Number(vg.ocupacao_media ?? 0),
+    },
+    vendasPorDia: d.vendas_por_dia ?? [],
+    mixMetodos: d.mix_metodos ?? [],
+    kpisRelatorios: {
+      presencaMedia: Number(rel.presenca_media ?? 0),
+      atrasos: rel.atrasos ?? 0,
+      ocupacao: Number(rel.ocupacao ?? 0),
+      viagensMes: rel.viagens_mes ?? 0,
+    },
+    historicoViagens: (d.historico_viagens ?? []).map((v) => ({
+      id: String(v.id),
+      destino: v.destino,
+      data: v.data,
+      ocupacao: Number(v.ocupacao ?? 0),
+      presenca: Number(v.presenca ?? 0),
+      receita: Number(v.receita ?? 0),
+    })),
+  };
 }

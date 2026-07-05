@@ -11,6 +11,16 @@ export function obterExcursao(id) {
   return api(`/excursoes/${id}`);
 }
 
+// POST /excursoes — cria uma excursão (gestão)
+export function criarExcursao(payload) {
+  return api("/excursoes", { method: "POST", body: payload });
+}
+
+// PUT /excursoes/{id} — atualiza uma excursão (gestão)
+export function atualizarExcursao(id, payload) {
+  return api(`/excursoes/${id}`, { method: "PUT", body: payload });
+}
+
 // GET /excursoes/{id}/painel — visão de gestão (empresa/admin)
 export function painelExcursao(id) {
   return api(`/excursoes/${id}/painel`);

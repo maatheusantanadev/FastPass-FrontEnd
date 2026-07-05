@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Check } from "lucide-react";
 import DashboardShell from "../../components/DashboardShell.jsx";
 import Button from "../../components/Button.jsx";
+import { criarExcursao } from "../../api/excursoes.js";
 
 function Campo({ label, className = "", children, ...props }) {
   return (
@@ -18,30 +19,70 @@ function Campo({ label, className = "", children, ...props }) {
   );
 }
 
+const selectClass =
+  "h-[46px] w-full rounded-[12px] border border-line bg-cobalt-tint/40 px-3.5 text-[15px] text-ink focus:border-cobalt focus:bg-white focus:outline-none";
+
 export default function NovaExcursaoScreen() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     destino: "",
     categoria: "praia",
-    data: "",
-    saida: "",
-    retorno: "",
+    cena: "praia",
+    empresa: "Bahia Sol Turismo",
+    dataSaida: "",
+    horaSaida: "06:30",
+    pontoPartida: "Terminal da França",
+    dataRetorno: "",
+    horaRetorno: "19:00",
+    pontoRetorno: "",
     preco: "",
     capacidade: "33",
-    empresa: "Bahia Sol Turismo",
   });
   const [erros, setErros] = useState({});
+  const [enviando, setEnviando] = useState(false);
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  function publicar(e) {
+  async function publicar(e) {
     e.preventDefault();
     const next = {};
     if (form.destino.trim().length < 3) next.destino = "Informe o destino.";
-    if (!form.data.trim()) next.data = "Informe a data.";
+    if (!form.dataSaida) next.dataSaida = "Informe a data de saída.";
     if (!form.preco || Number(form.preco) <= 0) next.preco = "Informe o preço.";
+    if (!form.capacidade || Number(form.capacidade) <= 0)
+      next.capacidade = "Informe a capacidade.";
     setErros(next);
-    if (Object.keys(next).length === 0) navigate("/painel/excursoes");
+    if (Object.keys(next).length > 0) return;
+
+    const payload = {
+      titulo: form.destino.trim(),
+      destino: form.destino.trim(),
+      categoria: form.categoria,
+      cena: form.cena,
+      empresa: form.empresa.trim() || null,
+      ponto_partida: form.pontoPartida.trim() || null,
+      ponto_retorno: form.pontoRetorno.trim() || null,
+      data_saida: `${form.dataSaida}T${form.horaSaida || "06:00"}`,
+      data_retorno: form.dataRetorno
+        ? `${form.dataRetorno}T${form.horaRetorno || "18:00"}`
+        : null,
+      preco: Number(form.preco),
+      vagas_total: Number(form.capacidade),
+    };
+
+    setEnviando(true);
+    try {
+      await criarExcursao(payload);
+      navigate("/painel/excursoes");
+    } catch (err) {
+      if (err.offline) {
+        navigate("/painel/excursoes"); // modo demonstração
+        return;
+      }
+      setErros({ geral: err.message || "Não foi possível publicar a excursão." });
+    } finally {
+      setEnviando(false);
+    }
   }
 
   return (
@@ -74,19 +115,38 @@ export default function NovaExcursaoScreen() {
             )}
 
             <Campo label="Categoria">
-              <select
-                value={form.categoria}
-                onChange={set("categoria")}
-                className="h-[46px] w-full rounded-[12px] border border-line bg-cobalt-tint/40 px-3.5 text-[15px] text-ink focus:border-cobalt focus:bg-white focus:outline-none"
-              >
+              <select value={form.categoria} onChange={set("categoria")} className={selectClass}>
                 <option value="praia">Praia</option>
                 <option value="aventura">Aventura</option>
               </select>
             </Campo>
-            <Campo label="Data" placeholder="Ex.: 19 ago, sáb" value={form.data} onChange={set("data")} />
+            <Campo label="Cena (ilustração)">
+              <select value={form.cena} onChange={set("cena")} className={selectClass}>
+                <option value="praia">Praia</option>
+                <option value="montanha">Montanha</option>
+                <option value="ilha">Ilha</option>
+              </select>
+            </Campo>
 
-            <Campo label="Saída" placeholder="06:30 · Terminal da França" value={form.saida} onChange={set("saida")} />
-            <Campo label="Retorno" placeholder="19:00 · destino" value={form.retorno} onChange={set("retorno")} />
+            <Campo label="Data de saída" type="date" value={form.dataSaida} onChange={set("dataSaida")} />
+            <Campo label="Hora de saída" type="time" value={form.horaSaida} onChange={set("horaSaida")} />
+            <Campo
+              label="Ponto de partida"
+              className="sm:col-span-2"
+              placeholder="Ex.: Terminal da França"
+              value={form.pontoPartida}
+              onChange={set("pontoPartida")}
+            />
+
+            <Campo label="Data de retorno" type="date" value={form.dataRetorno} onChange={set("dataRetorno")} />
+            <Campo label="Hora de retorno" type="time" value={form.horaRetorno} onChange={set("horaRetorno")} />
+            <Campo
+              label="Ponto de retorno"
+              className="sm:col-span-2"
+              placeholder="Ex.: Praia do Forte"
+              value={form.pontoRetorno}
+              onChange={set("pontoRetorno")}
+            />
 
             <Campo
               label="Preço por pessoa (R$)"
@@ -106,9 +166,9 @@ export default function NovaExcursaoScreen() {
 
             <Campo label="Empresa" className="sm:col-span-2" value={form.empresa} onChange={set("empresa")} />
           </div>
-          {(erros.data || erros.preco) && (
+          {(erros.dataSaida || erros.preco || erros.capacidade || erros.geral) && (
             <p className="mt-4 text-[13px] text-danger">
-              {erros.data || erros.preco}
+              {erros.dataSaida || erros.preco || erros.capacidade || erros.geral}
             </p>
           )}
         </div>
@@ -121,8 +181,14 @@ export default function NovaExcursaoScreen() {
           >
             Cancelar
           </Button>
-          <Button type="submit" variant="primary" icon={Check} className="px-5 py-2.5 text-[14px]">
-            Publicar excursão
+          <Button
+            type="submit"
+            variant="primary"
+            icon={Check}
+            className="px-5 py-2.5 text-[14px]"
+            disabled={enviando}
+          >
+            {enviando ? "Publicando…" : "Publicar excursão"}
           </Button>
         </div>
       </form>
