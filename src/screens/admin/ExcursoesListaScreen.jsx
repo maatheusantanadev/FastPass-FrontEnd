@@ -81,7 +81,12 @@ export default function ExcursoesListaScreen() {
       title="Excursões"
       subtitle="Bahia Sol Turismo"
       actions={
-        <Button variant="primary" icon={Plus} className="px-4 py-2 text-[13px]">
+        <Button
+          variant="primary"
+          icon={Plus}
+          className="px-4 py-2 text-[13px]"
+          onClick={() => navigate("/painel/excursoes/nova")}
+        >
           Nova excursão
         </Button>
       }

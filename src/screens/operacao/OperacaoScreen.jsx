@@ -39,9 +39,18 @@ export default function OperacaoScreen() {
             <Scene variant="praia" />
           </div>
           <div className="p-4">
-            <p className="text-[12px] font-semibold uppercase tracking-wide text-cobalt">
-              Viagem do dia
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-[12px] font-semibold uppercase tracking-wide text-cobalt">
+                Viagem do dia
+              </p>
+              <button
+                type="button"
+                onClick={() => navigate("/operacao/viagens")}
+                className="tap-target -my-2 flex items-center rounded-full px-2 text-[13px] font-semibold text-cobalt hover:bg-cobalt-tint"
+              >
+                Trocar
+              </button>
+            </div>
             <h1 className="mt-0.5 font-display text-[22px] font-medium text-ink">
               {resumoOperacao.excursao}
             </h1>

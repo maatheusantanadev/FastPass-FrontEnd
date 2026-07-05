@@ -31,6 +31,8 @@ import EmbarqueScreen from "./screens/passageiro/EmbarqueScreen.jsx";
 import RastreamentoScreen from "./screens/passageiro/RastreamentoScreen.jsx";
 import AvaliacaoScreen from "./screens/passageiro/AvaliacaoScreen.jsx";
 import ViagemDetalheScreen from "./screens/passageiro/ViagemDetalheScreen.jsx";
+import EditarPerfilScreen from "./screens/passageiro/EditarPerfilScreen.jsx";
+import AvisoDetalheScreen from "./screens/passageiro/AvisoDetalheScreen.jsx";
 
 // Operação / Motorista
 import OperacaoScreen from "./screens/operacao/OperacaoScreen.jsx";
@@ -41,10 +43,12 @@ import ValidacaoNaoIdentificadoScreen from "./screens/operacao/ValidacaoNaoIdent
 import ConferenciaManualScreen from "./screens/operacao/ConferenciaManualScreen.jsx";
 import ListaEmbarqueScreen from "./screens/operacao/ListaEmbarqueScreen.jsx";
 import EmbarqueConcluidoScreen from "./screens/operacao/EmbarqueConcluidoScreen.jsx";
+import SeletorViagemScreen from "./screens/operacao/SeletorViagemScreen.jsx";
 
 // Admin / Painel
 import VisaoGeralScreen from "./screens/admin/VisaoGeralScreen.jsx";
 import ExcursoesListaScreen from "./screens/admin/ExcursoesListaScreen.jsx";
+import NovaExcursaoScreen from "./screens/admin/NovaExcursaoScreen.jsx";
 import ExcursoesScreen from "./screens/admin/ExcursoesScreen.jsx";
 import ValidacaoTempoRealScreen from "./screens/admin/ValidacaoTempoRealScreen.jsx";
 import RelatoriosScreen from "./screens/admin/RelatoriosScreen.jsx";
@@ -85,9 +89,12 @@ export default function App() {
         <Route path="/app/rastreamento" element={<RastreamentoScreen />} />
         <Route path="/app/avaliacao" element={<AvaliacaoScreen />} />
         <Route path="/app/viagem/:id" element={<ViagemDetalheScreen />} />
+        <Route path="/app/perfil/editar" element={<EditarPerfilScreen />} />
+        <Route path="/app/aviso/:id" element={<AvisoDetalheScreen />} />
 
         {/* Operação / Motorista */}
         <Route path="/operacao" element={<OperacaoScreen />} />
+        <Route path="/operacao/viagens" element={<SeletorViagemScreen />} />
         <Route path="/operacao/facial" element={<ValidacaoFacialScreen />} />
         <Route path="/operacao/qr" element={<ValidacaoQrScreen />} />
         <Route path="/operacao/aprovado" element={<ValidacaoAprovadoScreen />} />
@@ -99,6 +106,7 @@ export default function App() {
         {/* Admin / Painel */}
         <Route path="/painel" element={<VisaoGeralScreen />} />
         <Route path="/painel/excursoes" element={<ExcursoesListaScreen />} />
+        <Route path="/painel/excursoes/nova" element={<NovaExcursaoScreen />} />
         <Route path="/painel/excursoes/:id" element={<ExcursoesScreen />} />
         <Route path="/painel/validacao" element={<ValidacaoTempoRealScreen />} />
         <Route path="/painel/relatorios" element={<RelatoriosScreen />} />

@@ -39,6 +39,13 @@ export default function PerfilScreen() {
             <Sparkles size={13} /> {usuario.pontos} pontos de fidelidade
           </p>
         </div>
+        <button
+          type="button"
+          onClick={() => navigate("/app/perfil/editar")}
+          className="tap-target shrink-0 rounded-full bg-white/15 px-4 text-[13px] font-semibold text-white hover:bg-white/25"
+        >
+          Editar
+        </button>
       </div>
 
       {/* embarque */}
