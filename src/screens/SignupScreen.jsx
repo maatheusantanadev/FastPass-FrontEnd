@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { User, Mail, Phone, IdCard, Lock } from "lucide-react";
 import BrandPanel from "../components/BrandPanel.jsx";
@@ -13,6 +13,7 @@ const strengthLabels = ["Fraca", "Razoável", "Boa", "Forte"];
 const strengthColors = ["bg-red-400", "bg-amber-400", "bg-amber-400", "bg-success"];
 
 export default function SignupScreen() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -50,7 +51,9 @@ export default function SignupScreen() {
     }
 
     setErrors(nextErrors);
-    setSuccess(Object.keys(nextErrors).length === 0);
+    const ok = Object.keys(nextErrors).length === 0;
+    setSuccess(ok);
+    if (ok) navigate("/termos");
   }
 
   return (

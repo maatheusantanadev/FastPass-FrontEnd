@@ -15,7 +15,7 @@ export default function SplashScreen() {
   const reducedMotion = useReducedMotion();
 
   useEffect(() => {
-    const timer = setTimeout(() => navigate("/boas-vindas"), 2200);
+    const timer = setTimeout(() => navigate("/onboarding"), 2200);
     return () => clearTimeout(timer);
   }, [navigate]);
 
