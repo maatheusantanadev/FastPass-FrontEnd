@@ -1,0 +1,89 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Calendar, Bus, Armchair } from "lucide-react";
+import MobileShell from "../../components/MobileShell.jsx";
+import TabBar from "../../components/TabBar.jsx";
+import PillTabs from "../../components/PillTabs.jsx";
+import Scene from "../../components/Scene.jsx";
+import Badge from "../../components/Badge.jsx";
+import Button from "../../components/Button.jsx";
+import { viagens } from "../../data/viagens.js";
+
+const statusBadge = {
+  confirmada: { tone: "success", label: "Confirmada" },
+  aguardando: { tone: "warning", label: "Aguardando embarque" },
+  concluida: { tone: "neutral", label: "Concluída" },
+};
+
+function ViagemCard({ viagem, proxima }) {
+  const navigate = useNavigate();
+  const info = statusBadge[viagem.status];
+  return (
+    <div className="overflow-hidden rounded-[20px] border border-line bg-white shadow-card">
+      <div className="flex gap-3 p-3">
+        <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl">
+          <Scene variant={viagem.cena} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="font-display text-[17px] font-medium text-ink">
+              {viagem.destino}
+            </h3>
+            <Badge tone={info.tone}>{info.label}</Badge>
+          </div>
+          <p className="mt-1 inline-flex items-center gap-1.5 text-[13px] text-muted">
+            <Calendar size={13} /> {viagem.data}
+          </p>
+          <div className="mt-1 flex items-center gap-3 text-[13px] text-muted">
+            <span className="inline-flex items-center gap-1.5">
+              <Bus size={13} /> {viagem.saida.split(" · ")[0]}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Armchair size={13} /> {viagem.assento}
+            </span>
+          </div>
+        </div>
+      </div>
+      {proxima && (
+        <div className="border-t border-line p-3">
+          <Button
+            variant={viagem.status === "confirmada" ? "primary" : "soft"}
+            fullWidth
+            onClick={() => navigate("/app/embarque")}
+          >
+            Fazer embarque
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function ViagensScreen() {
+  const [aba, setAba] = useState("proximas");
+  const lista = aba === "proximas" ? viagens.proximas : viagens.anteriores;
+
+  return (
+    <MobileShell footer={<TabBar />}>
+      <div className="px-5 pb-4 pt-[max(1.25rem,env(safe-area-inset-top))]">
+        <h1 className="mb-4 font-display text-[24px] font-medium text-ink">
+          Minhas viagens
+        </h1>
+        <PillTabs
+          value={aba}
+          onChange={setAba}
+          tabs={[
+            { value: "proximas", label: "Próximas" },
+            { value: "anteriores", label: "Anteriores" },
+          ]}
+        />
+      </div>
+
+      <div className="flex flex-col gap-4 px-5 pb-6">
+        {lista.map((v) => (
+          <ViagemCard key={v.id} viagem={v} proxima={aba === "proximas"} />
+        ))}
+      </div>
+    </MobileShell>
+  );
+}
