@@ -21,6 +21,14 @@ export function atualizarExcursao(id, payload) {
   return api(`/excursoes/${id}`, { method: "PUT", body: payload });
 }
 
+// POST /excursoes/{id}/passageiros — adiciona um passageiro por e-mail (gestão)
+export function adicionarPassageiro(id, email) {
+  return api(`/excursoes/${id}/passageiros`, {
+    method: "POST",
+    body: { email },
+  });
+}
+
 // GET /excursoes/{id}/painel — visão de gestão (empresa/admin)
 export function painelExcursao(id) {
   return api(`/excursoes/${id}/painel`);

@@ -8,7 +8,7 @@ import { embarcarPorFacial } from "../../api/embarque.js";
 
 export default function ValidacaoFacialScreen() {
   const navigate = useNavigate();
-  const { total, contagem, embarcar, excursaoId } = useOperacao();
+  const { total, contagem, embarcar, registrarEmbarque, excursaoId } = useOperacao();
   const { videoRef, iniciar, parar, capturar, disponivel } = useCamera({
     facingMode: "environment",
   });
@@ -40,8 +40,9 @@ export default function ValidacaoFacialScreen() {
     }
 
     try {
-      await embarcarPorFacial(excursaoId, imagem); // POST /embarque/facial
-      embarcar("facial"); // avança o contador local
+      const res = await embarcarPorFacial(excursaoId, imagem); // POST /embarque/facial
+      if (res?.compra) registrarEmbarque(res.compra, "facial");
+      else embarcar("facial");
       parar();
       navigate("/operacao/aprovado");
     } catch (err) {

@@ -49,6 +49,7 @@ import SeletorViagemScreen from "./screens/operacao/SeletorViagemScreen.jsx";
 import VisaoGeralScreen from "./screens/admin/VisaoGeralScreen.jsx";
 import ExcursoesListaScreen from "./screens/admin/ExcursoesListaScreen.jsx";
 import NovaExcursaoScreen from "./screens/admin/NovaExcursaoScreen.jsx";
+import EditarExcursaoScreen from "./screens/admin/EditarExcursaoScreen.jsx";
 import ExcursoesScreen from "./screens/admin/ExcursoesScreen.jsx";
 import ValidacaoTempoRealScreen from "./screens/admin/ValidacaoTempoRealScreen.jsx";
 import RelatoriosScreen from "./screens/admin/RelatoriosScreen.jsx";
@@ -107,6 +108,7 @@ export default function App() {
         <Route path="/painel" element={<VisaoGeralScreen />} />
         <Route path="/painel/excursoes" element={<ExcursoesListaScreen />} />
         <Route path="/painel/excursoes/nova" element={<NovaExcursaoScreen />} />
+        <Route path="/painel/excursoes/:id/editar" element={<EditarExcursaoScreen />} />
         <Route path="/painel/excursoes/:id" element={<ExcursoesScreen />} />
         <Route path="/painel/validacao" element={<ValidacaoTempoRealScreen />} />
         <Route path="/painel/relatorios" element={<RelatoriosScreen />} />

@@ -10,7 +10,8 @@ import { resumoOperacao } from "../../data/passageiros.js";
 
 export default function ValidacaoAprovadoScreen() {
   const navigate = useNavigate();
-  const { ultimo, contagem, total } = useOperacao();
+  const { ultimo, contagem, total, excursaoNome } = useOperacao();
+  const destino = excursaoNome ?? resumoOperacao.excursao;
 
   const p = ultimo ?? {
     nome: "Passageiro",
@@ -48,7 +49,7 @@ export default function ValidacaoAprovadoScreen() {
               <Armchair size={14} /> Assento {p.assento}
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <MapPin size={14} /> {resumoOperacao.excursao}
+              <MapPin size={14} /> {destino}
             </span>
           </div>
           <div className="mt-3 flex items-center gap-2">

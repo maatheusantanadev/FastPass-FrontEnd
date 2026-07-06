@@ -107,6 +107,31 @@ export function passageirosDoPainel(painel) {
   }));
 }
 
+// confirmada|embarcada|concluida|cancelada → status da lista da operação
+const STATUS_OPERACAO = {
+  confirmada: "pendente",
+  embarcada: "embarcado",
+  concluida: "embarcado",
+  cancelada: "ausente",
+};
+
+// Compra do painel → passageiro no formato das telas de operação.
+export function passageiroDaOperacao(c) {
+  if (!c) return null;
+  return {
+    id: String(c.id),
+    nome: c.user?.name ?? "—",
+    cpf: c.user?.cpf ?? "—",
+    assento: "—",
+    status: STATUS_OPERACAO[c.status] ?? "pendente",
+    metodo: c.metodo_embarque ?? null,
+    horario: c.embarcado_em ? hora(c.embarcado_em) : null,
+    pagamento: c.status === "cancelada" ? "pendente" : "pago",
+    codigoQr: c.codigo_qr ?? null,
+    raw: c,
+  };
+}
+
 // GET /dashboard → shapes usados pelo painel (Visão geral e Relatórios).
 export function dashboardDoBackend(d) {
   if (!d) return null;

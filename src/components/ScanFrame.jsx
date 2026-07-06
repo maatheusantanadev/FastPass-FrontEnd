@@ -86,6 +86,15 @@ export default function ScanFrame({
           className="relative overflow-hidden rounded-[26px]"
           style={{ width: size - 24, height: size - 24 }}
         >
+          {videoRef && (
+            <video
+              ref={videoRef}
+              autoPlay
+              muted
+              playsInline
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          )}
           {["left-0 top-0 border-l-2 border-t-2 rounded-tl-xl",
             "right-0 top-0 border-r-2 border-t-2 rounded-tr-xl",
             "left-0 bottom-0 border-l-2 border-b-2 rounded-bl-xl",

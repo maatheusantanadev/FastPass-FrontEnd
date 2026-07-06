@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ScanFace } from "lucide-react";
 import MobileShell from "../../components/MobileShell.jsx";
@@ -17,8 +18,14 @@ function Metric({ label, value, tone }) {
 
 export default function ListaEmbarqueScreen() {
   const navigate = useNavigate();
-  const { lista, total, contagem } = useOperacao();
-  const pct = Math.round((contagem.embarcados / total) * 100);
+  const { lista, total, contagem, carregarPainel } = useOperacao();
+  const pct = total ? Math.round((contagem.embarcados / total) * 100) : 0;
+
+  // Re-sincroniza com o backend ao abrir (contadores/embarques atualizados).
+  useEffect(() => {
+    carregarPainel();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // embarcados primeiro (mais recentes no topo), depois pendentes/ausentes
   const ordenada = [...lista].sort((a, b) => {

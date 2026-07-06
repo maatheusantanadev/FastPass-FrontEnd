@@ -17,3 +17,11 @@ export function embarcarPorQrCode(codigoQr) {
     body: { codigo_qr: codigoQr },
   });
 }
+
+// POST /embarque/manual — { compra_id } (conferência manual do operador)
+export function embarcarManual(compraId) {
+  return api("/embarque/manual", {
+    method: "POST",
+    body: { compra_id: compraId },
+  });
+}
