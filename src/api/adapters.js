@@ -69,6 +69,7 @@ export function excursaoDoBackend(e) {
 
 // confirmada | embarcada | concluida | cancelada → status usado no app
 const STATUS_VIAGEM = {
+  pendente_pagamento: "aguardando",
   confirmada: "confirmada",
   embarcada: "confirmada",
   concluida: "concluida",
