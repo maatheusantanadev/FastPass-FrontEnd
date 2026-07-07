@@ -6,12 +6,13 @@ import BrandPanel from "../components/BrandPanel.jsx";
 import TextField from "../components/TextField.jsx";
 import Button from "../components/Button.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
+import { encontrarContaFixa } from "../data/contasFixas.js";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function LoginScreen() {
   const navigate = useNavigate();
-  const { entrar } = useAuth();
+  const { entrar, entrarFixo } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
@@ -30,6 +31,14 @@ export default function LoginScreen() {
 
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
+
+    // Contas fixas (motorista/administrador) — atalho sem backend.
+    const contaFixa = encontrarContaFixa(email, password);
+    if (contaFixa) {
+      entrarFixo(contaFixa.usuario);
+      navigate(contaFixa.redirect);
+      return;
+    }
 
     setEnviando(true);
     try {
@@ -113,7 +122,8 @@ export default function LoginScreen() {
           variant="soft"
           icon={ScanFace}
           fullWidth
-          onClick={() => navigate("/app/explorar")}
+          disabled
+          title="Em breve"
         >
           Entrar com Face ID
         </Button>

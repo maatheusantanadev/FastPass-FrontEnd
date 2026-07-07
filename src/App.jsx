@@ -54,6 +54,9 @@ import ExcursoesScreen from "./screens/admin/ExcursoesScreen.jsx";
 import ValidacaoTempoRealScreen from "./screens/admin/ValidacaoTempoRealScreen.jsx";
 import RelatoriosScreen from "./screens/admin/RelatoriosScreen.jsx";
 
+// Proteção de rotas por perfil
+import RotaProtegida from "./components/RotaProtegida.jsx";
+
 export default function App() {
   const location = useLocation();
 
@@ -94,24 +97,28 @@ export default function App() {
         <Route path="/app/aviso/:id" element={<AvisoDetalheScreen />} />
 
         {/* Operação / Motorista */}
-        <Route path="/operacao" element={<OperacaoScreen />} />
-        <Route path="/operacao/viagens" element={<SeletorViagemScreen />} />
-        <Route path="/operacao/facial" element={<ValidacaoFacialScreen />} />
-        <Route path="/operacao/qr" element={<ValidacaoQrScreen />} />
-        <Route path="/operacao/aprovado" element={<ValidacaoAprovadoScreen />} />
-        <Route path="/operacao/nao-identificado" element={<ValidacaoNaoIdentificadoScreen />} />
-        <Route path="/operacao/manual" element={<ConferenciaManualScreen />} />
-        <Route path="/operacao/lista" element={<ListaEmbarqueScreen />} />
-        <Route path="/operacao/fim" element={<EmbarqueConcluidoScreen />} />
+        <Route element={<RotaProtegida perfil="motorista" />}>
+          <Route path="/operacao" element={<OperacaoScreen />} />
+          <Route path="/operacao/viagens" element={<SeletorViagemScreen />} />
+          <Route path="/operacao/facial" element={<ValidacaoFacialScreen />} />
+          <Route path="/operacao/qr" element={<ValidacaoQrScreen />} />
+          <Route path="/operacao/aprovado" element={<ValidacaoAprovadoScreen />} />
+          <Route path="/operacao/nao-identificado" element={<ValidacaoNaoIdentificadoScreen />} />
+          <Route path="/operacao/manual" element={<ConferenciaManualScreen />} />
+          <Route path="/operacao/lista" element={<ListaEmbarqueScreen />} />
+          <Route path="/operacao/fim" element={<EmbarqueConcluidoScreen />} />
+        </Route>
 
         {/* Admin / Painel */}
-        <Route path="/painel" element={<VisaoGeralScreen />} />
-        <Route path="/painel/excursoes" element={<ExcursoesListaScreen />} />
-        <Route path="/painel/excursoes/nova" element={<NovaExcursaoScreen />} />
-        <Route path="/painel/excursoes/:id/editar" element={<EditarExcursaoScreen />} />
-        <Route path="/painel/excursoes/:id" element={<ExcursoesScreen />} />
-        <Route path="/painel/validacao" element={<ValidacaoTempoRealScreen />} />
-        <Route path="/painel/relatorios" element={<RelatoriosScreen />} />
+        <Route element={<RotaProtegida perfil="administrador" />}>
+          <Route path="/painel" element={<VisaoGeralScreen />} />
+          <Route path="/painel/excursoes" element={<ExcursoesListaScreen />} />
+          <Route path="/painel/excursoes/nova" element={<NovaExcursaoScreen />} />
+          <Route path="/painel/excursoes/:id/editar" element={<EditarExcursaoScreen />} />
+          <Route path="/painel/excursoes/:id" element={<ExcursoesScreen />} />
+          <Route path="/painel/validacao" element={<ValidacaoTempoRealScreen />} />
+          <Route path="/painel/relatorios" element={<RelatoriosScreen />} />
+        </Route>
       </Routes>
     </AnimatePresence>
   );
