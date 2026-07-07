@@ -1,10 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { ScanFace, QrCode, Sparkles, ChevronRight, LogOut, ShieldCheck } from "lucide-react";
+import { ScanFace, QrCode, ChevronRight, LogOut, ShieldCheck } from "lucide-react";
 import MobileShell from "../../components/MobileShell.jsx";
 import TabBar from "../../components/TabBar.jsx";
 import Avatar from "../../components/Avatar.jsx";
-import Badge from "../../components/Badge.jsx";
-import { usuario } from "../../data/passageiros.js";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 function Item({ icon: Icon, label, valor, onClick }) {
   return (
@@ -23,6 +22,15 @@ function Item({ icon: Icon, label, valor, onClick }) {
 
 export default function PerfilScreen() {
   const navigate = useNavigate();
+  const { usuario, sair } = useAuth();
+
+  const nome = usuario?.name ?? "Passageiro";
+  const email = usuario?.email ?? "";
+
+  async function sairDaConta() {
+    await sair();
+    navigate("/login");
+  }
 
   return (
     <MobileShell footer={<TabBar />}>
@@ -32,12 +40,12 @@ export default function PerfilScreen() {
 
       {/* cartão do usuário */}
       <div className="mx-5 flex items-center gap-4 rounded-2xl bg-cobalt p-4 text-white">
-        <Avatar nome={usuario.nomeCompleto} size="lg" className="bg-white/20 text-white" />
+        <Avatar nome={nome} size="lg" className="bg-white/20 text-white" />
         <div className="min-w-0 flex-1">
-          <p className="font-display text-[19px] font-medium">{usuario.nomeCompleto}</p>
-          <p className="inline-flex items-center gap-1.5 text-[13px] text-white/70">
-            <Sparkles size={13} /> {usuario.pontos} pontos de fidelidade
-          </p>
+          <p className="font-display text-[19px] font-medium">{nome}</p>
+          {email && (
+            <p className="truncate text-[13px] text-white/70">{email}</p>
+          )}
         </div>
         <button
           type="button"
@@ -54,11 +62,12 @@ export default function PerfilScreen() {
           Embarque
         </p>
         <div className="divide-y divide-line rounded-2xl border border-line">
-          <div className="flex items-center gap-3 px-4 py-3.5">
-            <ScanFace size={19} className="text-cobalt" />
-            <span className="flex-1 text-[15px] text-ink">Face ID</span>
-            <Badge tone="success" icon={ShieldCheck}>Ativo</Badge>
-          </div>
+          <Item
+            icon={ScanFace}
+            label="Reconhecimento facial"
+            valor="Atualizar"
+            onClick={() => navigate("/faceid")}
+          />
           <Item icon={QrCode} label="QR Code de embarque" onClick={() => navigate("/qr")} />
         </div>
       </div>
@@ -70,7 +79,7 @@ export default function PerfilScreen() {
         </p>
         <div className="divide-y divide-line rounded-2xl border border-line">
           <Item icon={ShieldCheck} label="Termos e privacidade" onClick={() => navigate("/termos")} />
-          <Item icon={LogOut} label="Sair" onClick={() => navigate("/login")} />
+          <Item icon={LogOut} label="Sair" onClick={sairDaConta} />
         </div>
       </div>
 

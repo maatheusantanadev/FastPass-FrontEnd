@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Mail, Lock, ScanFace } from "lucide-react";
+import { Mail, Lock } from "lucide-react";
 import BrandPanel from "../components/BrandPanel.jsx";
 import TextField from "../components/TextField.jsx";
 import Button from "../components/Button.jsx";
@@ -104,22 +104,6 @@ export default function LoginScreen() {
             {enviando ? "Entrando…" : "Entrar"}
           </Button>
         </form>
-
-        <div className="my-6 flex items-center gap-4">
-          <div className="h-px flex-1 bg-line" />
-          <span className="font-body text-[13px] text-muted">ou</span>
-          <div className="h-px flex-1 bg-line" />
-        </div>
-
-        <Button
-          variant="soft"
-          icon={ScanFace}
-          fullWidth
-          disabled
-          title="Em breve"
-        >
-          Entrar com Face ID
-        </Button>
 
         <p className="mt-auto pt-10 text-center font-body text-[14px] text-muted">
           Novo por aqui?{" "}

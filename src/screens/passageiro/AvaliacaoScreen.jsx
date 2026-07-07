@@ -1,13 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
 import MobileShell from "../../components/MobileShell.jsx";
 import AppHeader from "../../components/AppHeader.jsx";
 import StarRating from "../../components/StarRating.jsx";
 import SuccessCheck from "../../components/SuccessCheck.jsx";
 import Button from "../../components/Button.jsx";
-import { usuario } from "../../data/passageiros.js";
 
 export default function AvaliacaoScreen() {
   const navigate = useNavigate();
@@ -34,22 +31,6 @@ export default function AvaliacaoScreen() {
           <p className="mt-2 text-[15px] text-muted">
             Sua opinião ajuda a melhorar as próximas viagens.
           </p>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3, type: "spring", stiffness: 260, damping: 18 }}
-            className="mt-8 flex w-full items-center gap-3 rounded-2xl bg-cobalt p-4 text-white"
-          >
-            <Sparkles size={26} strokeWidth={2} />
-            <div className="text-left">
-              <p className="font-display text-[20px] font-semibold leading-none">
-                +150 pontos
-              </p>
-              <p className="mt-1 text-[13px] text-white/70">
-                Você agora tem {usuario.pontos + 150} pontos de fidelidade.
-              </p>
-            </div>
-          </motion.div>
         </div>
       </MobileShell>
     );

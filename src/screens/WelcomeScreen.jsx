@@ -17,8 +17,7 @@ export default function WelcomeScreen() {
         >
           <Wordmark tone="dark" size="lg" />
           <p className="max-w-[280px] font-body text-[15px] leading-relaxed text-muted">
-            Compra, cadastro e embarque em segundos — tudo no reconhecimento
-            facial.
+            Compra, cadastro e embarque em segundos, direto do seu celular.
           </p>
         </motion.div>
 

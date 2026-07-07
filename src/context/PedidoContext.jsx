@@ -1,51 +1,24 @@
 import { createContext, useContext, useMemo, useState } from "react";
-import { excursoes, cupons } from "../data/excursoes.js";
 
-// Estado do pedido em memória (frontend-only, sem backend).
+// Estado do pedido em andamento (checkout). A excursão é escolhida na tela de
+// detalhes e vem do backend; nada de dados fictícios aqui.
 const PedidoContext = createContext(null);
 
 export function PedidoProvider({ children }) {
-  const [excursao, setExcursao] = useState(excursoes[0]);
+  const [excursao, setExcursao] = useState(null);
   const [assento, setAssento] = useState(null);
-  const [extras, setExtras] = useState([]);
-  const [cupom, setCupom] = useState(null);
   const [compra, setCompra] = useState(null); // compra criada no checkout (com codigo_qr)
-
-  function toggleExtra(item) {
-    setExtras((prev) =>
-      prev.find((e) => e.id === item.id)
-        ? prev.filter((e) => e.id !== item.id)
-        : [...prev, item]
-    );
-  }
-
-  function aplicarCupom(codigo) {
-    const cod = codigo.trim().toUpperCase();
-    if (cupons[cod]) {
-      setCupom({ codigo: cod, ...cupons[cod] });
-      return true;
-    }
-    return false;
-  }
 
   const totais = useMemo(() => {
     const base = excursao?.preco ?? 0;
-    const extrasTotal = extras.reduce((s, e) => s + e.preco, 0);
-    const subtotal = base + extrasTotal;
-    const desconto = cupom ? subtotal * cupom.desconto : 0;
-    return { base, extrasTotal, subtotal, desconto, total: subtotal - desconto };
-  }, [excursao, extras, cupom]);
+    return { base, subtotal: base, total: base };
+  }, [excursao]);
 
   const value = {
     excursao,
     setExcursao,
     assento,
     setAssento,
-    extras,
-    toggleExtra,
-    cupom,
-    aplicarCupom,
-    setCupom,
     compra,
     setCompra,
     totais,

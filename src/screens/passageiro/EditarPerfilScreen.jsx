@@ -7,17 +7,18 @@ import AppHeader from "../../components/AppHeader.jsx";
 import TextField from "../../components/TextField.jsx";
 import Avatar from "../../components/Avatar.jsx";
 import Button from "../../components/Button.jsx";
-import { usuario } from "../../data/passageiros.js";
+import { useAuth } from "../../context/AuthContext.jsx";
 import { formatPhone } from "../../utils/masks.js";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function EditarPerfilScreen() {
   const navigate = useNavigate();
+  const { usuario } = useAuth();
   const [form, setForm] = useState({
-    nome: usuario.nomeCompleto,
-    email: "maria@email.com",
-    telefone: "(71) 9 9888-7766",
+    nome: usuario?.name ?? "",
+    email: usuario?.email ?? "",
+    telefone: formatPhone(usuario?.telefone ?? ""),
   });
   const [erros, setErros] = useState({});
   const [salvo, setSalvo] = useState(false);

@@ -7,7 +7,6 @@ import PillTabs from "../../components/PillTabs.jsx";
 import Scene from "../../components/Scene.jsx";
 import Badge from "../../components/Badge.jsx";
 import Button from "../../components/Button.jsx";
-import { viagens as viagensMock } from "../../data/viagens.js";
 import { listarCompras } from "../../api/compras.js";
 import { compraParaViagem } from "../../api/adapters.js";
 
@@ -68,9 +67,9 @@ function ViagemCard({ viagem, proxima }) {
 
 export default function ViagensScreen() {
   const [aba, setAba] = useState("proximas");
-  const [viagens, setViagens] = useState(viagensMock);
+  const [viagens, setViagens] = useState({ proximas: [], anteriores: [] });
 
-  // Carrega as compras do passageiro; mantém o mock se o backend estiver offline.
+  // Carrega as compras do passageiro a partir do backend.
   useEffect(() => {
     let vivo = true;
     listarCompras()
@@ -111,9 +110,17 @@ export default function ViagensScreen() {
       </div>
 
       <div className="flex flex-col gap-4 px-5 pb-6">
-        {lista.map((v) => (
-          <ViagemCard key={v.id} viagem={v} proxima={aba === "proximas"} />
-        ))}
+        {lista.length === 0 ? (
+          <p className="py-10 text-center text-[14px] text-muted">
+            {aba === "proximas"
+              ? "Você ainda não tem viagens. Explore os destinos disponíveis."
+              : "Nenhuma viagem anterior por aqui."}
+          </p>
+        ) : (
+          lista.map((v) => (
+            <ViagemCard key={v.id} viagem={v} proxima={aba === "proximas"} />
+          ))
+        )}
       </div>
     </MobileShell>
   );

@@ -5,8 +5,6 @@ import TabBar from "../../components/TabBar.jsx";
 import Chip from "../../components/Chip.jsx";
 import Avatar from "../../components/Avatar.jsx";
 import ExcursionCard from "../../components/ExcursionCard.jsx";
-import { excursoes as excursoesMock } from "../../data/excursoes.js";
-import { usuario } from "../../data/passageiros.js";
 import { listarExcursoes } from "../../api/excursoes.js";
 import { excursaoDoBackend } from "../../api/adapters.js";
 import { useAuth } from "../../context/AuthContext.jsx";
@@ -23,14 +21,14 @@ export default function ExplorarScreen() {
   const { usuario: authUser } = useAuth();
   const [filtro, setFiltro] = useState("todos");
   const [busca, setBusca] = useState("");
-  const [excursoes, setExcursoes] = useState(excursoesMock);
+  const [excursoes, setExcursoes] = useState([]);
 
-  // Carrega o catálogo da API; mantém o mock se o backend estiver fora do ar.
+  // Carrega o catálogo da API.
   useEffect(() => {
     let vivo = true;
     listarExcursoes()
       .then((lista) => {
-        if (vivo && Array.isArray(lista) && lista.length) {
+        if (vivo && Array.isArray(lista)) {
           setExcursoes(lista.map(excursaoDoBackend));
         }
       })
@@ -40,8 +38,8 @@ export default function ExplorarScreen() {
     };
   }, []);
 
-  const primeiroNome = authUser?.name?.trim().split(" ")[0] ?? usuario.nome;
-  const nomeCompleto = authUser?.name ?? usuario.nomeCompleto;
+  const primeiroNome = authUser?.name?.trim().split(" ")[0] ?? "viajante";
+  const nomeCompleto = authUser?.name ?? "Passageiro";
 
   const lista = useMemo(() => {
     return excursoes.filter((e) => {

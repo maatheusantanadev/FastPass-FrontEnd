@@ -1,10 +1,9 @@
 import { NavLink } from "react-router-dom";
-import { Compass, Ticket, Bell, User } from "lucide-react";
+import { Compass, Ticket, User } from "lucide-react";
 
 const tabs = [
   { to: "/app/explorar", label: "Explorar", icon: Compass },
   { to: "/app/viagens", label: "Viagens", icon: Ticket },
-  { to: "/app/avisos", label: "Avisos", icon: Bell },
   { to: "/app/perfil", label: "Perfil", icon: User },
 ];
 
