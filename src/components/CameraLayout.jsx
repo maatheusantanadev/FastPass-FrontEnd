@@ -3,7 +3,7 @@ import { ScanFace, QrCode, ClipboardCheck, X } from "lucide-react";
 
 // Layout imersivo das telas de câmera da operação (fundo escuro, tela cheia).
 const modos = [
-  { id: "facial", label: "Face ID", icon: ScanFace, to: "/operacao/facial" },
+  { id: "facial", label: "Pedidos", icon: ScanFace, to: "/operacao/pedidos" },
   { id: "qr", label: "QR Code", icon: QrCode, to: "/operacao/qr" },
   { id: "manual", label: "Manual", icon: ClipboardCheck, to: "/operacao/manual" },
 ];
@@ -29,10 +29,10 @@ export default function CameraLayout({ modo, embarcados, total, legenda, childre
       </div>
 
       {/* área da câmera */}
-      <div className="flex flex-1 flex-col items-center justify-center px-6">
+      <div className="flex flex-1 flex-col items-center justify-center overflow-hidden px-6">
         {children}
         {legenda && (
-          <p className="mt-8 max-w-[280px] text-center text-[15px] leading-relaxed text-white/80">
+          <p className="mt-8 max-w-[280px] shrink-0 text-center text-[15px] leading-relaxed text-white/80">
             {legenda}
           </p>
         )}

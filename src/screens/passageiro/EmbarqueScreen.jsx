@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ScanFace, QrCode, Check } from "lucide-react";
 import MobileShell from "../../components/MobileShell.jsx";
 import AppHeader from "../../components/AppHeader.jsx";
@@ -10,29 +10,38 @@ const opcoes = [
     id: "facial",
     icon: ScanFace,
     titulo: "Reconhecimento facial",
-    apoio: "O operador aponta a câmera e você embarca em segundos.",
+    apoio: "Tire uma selfie e o motorista confirma seu embarque comparando com a foto cadastrada.",
     recomendado: true,
   },
   {
     id: "qr",
     icon: QrCode,
     titulo: "QR Code",
-    apoio: "Mostre seu código na tela. Funciona offline.",
+    apoio: "Mostre seu código na tela para o motorista ler. Funciona offline.",
     recomendado: false,
   },
 ];
 
 export default function EmbarqueScreen() {
   const navigate = useNavigate();
+  const { id } = useParams();
   const [metodo, setMetodo] = useState("facial");
+
+  function continuar() {
+    if (metodo === "facial") {
+      navigate(`/app/embarque/${id}/facial`);
+    } else {
+      navigate(`/app/viagem/${id}`); // mostra o QR Code do bilhete
+    }
+  }
 
   return (
     <MobileShell
-      header={<AppHeader title="Embarque" subtitle="Praia do Forte · 15 jul" />}
+      header={<AppHeader title="Embarque" onBack={() => navigate(-1)} />}
       footer={
         <div className="border-t border-line px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-          <Button variant="primary" fullWidth onClick={() => navigate("/app/rastreamento")}>
-            Apresentar ao operador
+          <Button variant="primary" fullWidth onClick={continuar}>
+            Continuar
           </Button>
         </div>
       }

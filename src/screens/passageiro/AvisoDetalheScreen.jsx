@@ -11,7 +11,7 @@ const config = {
     tone: "bg-cobalt-tint text-cobalt-dark",
     detalhe:
       "Chegue com 20 minutos de antecedência ao Terminal da França. Tenha o Face ID ou o QR Code em mãos para agilizar o embarque.",
-    acao: { label: "Fazer embarque", to: "/app/embarque" },
+    acao: { label: "Ver minhas viagens", to: "/app/viagens" },
   },
   pagamento: {
     icon: CheckCircle2,

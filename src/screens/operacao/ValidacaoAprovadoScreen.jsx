@@ -59,7 +59,7 @@ export default function ValidacaoAprovadoScreen() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Button variant="soft" fullWidth onClick={() => navigate("/operacao/facial")}>
+        <Button variant="soft" fullWidth onClick={() => navigate("/operacao/pedidos")}>
           Próximo passageiro
         </Button>
         <button

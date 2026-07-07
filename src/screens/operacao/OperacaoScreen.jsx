@@ -47,7 +47,7 @@ export default function OperacaoScreen() {
             icon={ScanFace}
             fullWidth
             disabled={!excursaoId}
-            onClick={() => navigate("/operacao/facial")}
+            onClick={() => navigate("/operacao/pedidos")}
           >
             Iniciar embarque
           </Button>

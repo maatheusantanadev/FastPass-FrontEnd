@@ -30,7 +30,7 @@ export default function ValidacaoNaoIdentificadoScreen() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Button variant="soft" icon={RotateCw} fullWidth onClick={() => navigate("/operacao/facial")}>
+        <Button variant="soft" icon={RotateCw} fullWidth onClick={() => navigate("/operacao/pedidos")}>
           Tentar novamente
         </Button>
         <Button

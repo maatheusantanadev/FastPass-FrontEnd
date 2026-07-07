@@ -112,7 +112,7 @@ export default function ViagemDetalheScreen() {
           <Button
             variant={viagem.status === "confirmada" ? "primary" : "soft"}
             fullWidth
-            onClick={() => navigate("/app/embarque")}
+            onClick={() => navigate(`/app/embarque/${viagem.id}`)}
           >
             Fazer embarque
           </Button>

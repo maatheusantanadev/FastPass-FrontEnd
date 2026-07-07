@@ -28,6 +28,8 @@ import ViagensScreen from "./screens/passageiro/ViagensScreen.jsx";
 import AvisosScreen from "./screens/passageiro/AvisosScreen.jsx";
 import PerfilScreen from "./screens/passageiro/PerfilScreen.jsx";
 import EmbarqueScreen from "./screens/passageiro/EmbarqueScreen.jsx";
+import SolicitarEmbarqueScreen from "./screens/passageiro/SolicitarEmbarqueScreen.jsx";
+import AguardandoValidacaoScreen from "./screens/passageiro/AguardandoValidacaoScreen.jsx";
 import RastreamentoScreen from "./screens/passageiro/RastreamentoScreen.jsx";
 import AvaliacaoScreen from "./screens/passageiro/AvaliacaoScreen.jsx";
 import ViagemDetalheScreen from "./screens/passageiro/ViagemDetalheScreen.jsx";
@@ -36,7 +38,7 @@ import AvisoDetalheScreen from "./screens/passageiro/AvisoDetalheScreen.jsx";
 
 // Operação / Motorista
 import OperacaoScreen from "./screens/operacao/OperacaoScreen.jsx";
-import ValidacaoFacialScreen from "./screens/operacao/ValidacaoFacialScreen.jsx";
+import PedidosEmbarqueScreen from "./screens/operacao/PedidosEmbarqueScreen.jsx";
 import ValidacaoQrScreen from "./screens/operacao/ValidacaoQrScreen.jsx";
 import ValidacaoAprovadoScreen from "./screens/operacao/ValidacaoAprovadoScreen.jsx";
 import ValidacaoNaoIdentificadoScreen from "./screens/operacao/ValidacaoNaoIdentificadoScreen.jsx";
@@ -89,7 +91,9 @@ export default function App() {
         <Route path="/app/viagens" element={<ViagensScreen />} />
         <Route path="/app/avisos" element={<AvisosScreen />} />
         <Route path="/app/perfil" element={<PerfilScreen />} />
-        <Route path="/app/embarque" element={<EmbarqueScreen />} />
+        <Route path="/app/embarque/:id" element={<EmbarqueScreen />} />
+        <Route path="/app/embarque/:id/facial" element={<SolicitarEmbarqueScreen />} />
+        <Route path="/app/embarque/:id/aguardando" element={<AguardandoValidacaoScreen />} />
         <Route path="/app/rastreamento" element={<RastreamentoScreen />} />
         <Route path="/app/avaliacao" element={<AvaliacaoScreen />} />
         <Route path="/app/viagem/:id" element={<ViagemDetalheScreen />} />
@@ -100,7 +104,7 @@ export default function App() {
         <Route element={<RotaProtegida perfil="motorista" />}>
           <Route path="/operacao" element={<OperacaoScreen />} />
           <Route path="/operacao/viagens" element={<SeletorViagemScreen />} />
-          <Route path="/operacao/facial" element={<ValidacaoFacialScreen />} />
+          <Route path="/operacao/pedidos" element={<PedidosEmbarqueScreen />} />
           <Route path="/operacao/qr" element={<ValidacaoQrScreen />} />
           <Route path="/operacao/aprovado" element={<ValidacaoAprovadoScreen />} />
           <Route path="/operacao/nao-identificado" element={<ValidacaoNaoIdentificadoScreen />} />

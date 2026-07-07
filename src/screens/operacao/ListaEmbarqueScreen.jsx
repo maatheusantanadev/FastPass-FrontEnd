@@ -53,7 +53,7 @@ export default function ListaEmbarqueScreen() {
       header={<OperationHeader embarcados={contagem.embarcados} total={total} />}
       footer={
         <div className="flex flex-col gap-2 border-t border-line px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-          <Button variant="primary" icon={ScanFace} fullWidth onClick={() => navigate("/operacao/facial")}>
+          <Button variant="primary" icon={ScanFace} fullWidth onClick={() => navigate("/operacao/pedidos")}>
             Continuar validando
           </Button>
           <Button variant="soft" fullWidth disabled={encerrando} onClick={encerrar}>
