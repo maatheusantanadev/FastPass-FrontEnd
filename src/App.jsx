@@ -20,12 +20,10 @@ import ContaCriadaScreen from "./screens/passageiro/ContaCriadaScreen.jsx";
 import ExplorarScreen from "./screens/passageiro/ExplorarScreen.jsx";
 import DetalhesScreen from "./screens/passageiro/DetalhesScreen.jsx";
 import AssentosScreen from "./screens/passageiro/AssentosScreen.jsx";
-import PasseiosScreen from "./screens/passageiro/PasseiosScreen.jsx";
 import ResumoScreen from "./screens/passageiro/ResumoScreen.jsx";
 import PagamentoScreen from "./screens/passageiro/PagamentoScreen.jsx";
 import ConfirmacaoScreen from "./screens/passageiro/ConfirmacaoScreen.jsx";
 import ViagensScreen from "./screens/passageiro/ViagensScreen.jsx";
-import AvisosScreen from "./screens/passageiro/AvisosScreen.jsx";
 import PerfilScreen from "./screens/passageiro/PerfilScreen.jsx";
 import EmbarqueScreen from "./screens/passageiro/EmbarqueScreen.jsx";
 import SolicitarEmbarqueScreen from "./screens/passageiro/SolicitarEmbarqueScreen.jsx";
@@ -34,7 +32,6 @@ import RastreamentoScreen from "./screens/passageiro/RastreamentoScreen.jsx";
 import AvaliacaoScreen from "./screens/passageiro/AvaliacaoScreen.jsx";
 import ViagemDetalheScreen from "./screens/passageiro/ViagemDetalheScreen.jsx";
 import EditarPerfilScreen from "./screens/passageiro/EditarPerfilScreen.jsx";
-import AvisoDetalheScreen from "./screens/passageiro/AvisoDetalheScreen.jsx";
 
 // Operação / Motorista
 import OperacaoScreen from "./screens/operacao/OperacaoScreen.jsx";
@@ -84,12 +81,10 @@ export default function App() {
         <Route path="/app/explorar" element={<ExplorarScreen />} />
         <Route path="/app/excursao/:id" element={<DetalhesScreen />} />
         <Route path="/app/assentos" element={<AssentosScreen />} />
-        <Route path="/app/passeios" element={<PasseiosScreen />} />
         <Route path="/app/resumo" element={<ResumoScreen />} />
         <Route path="/app/pagamento" element={<PagamentoScreen />} />
         <Route path="/app/confirmacao" element={<ConfirmacaoScreen />} />
         <Route path="/app/viagens" element={<ViagensScreen />} />
-        <Route path="/app/avisos" element={<AvisosScreen />} />
         <Route path="/app/perfil" element={<PerfilScreen />} />
         <Route path="/app/embarque/:id" element={<EmbarqueScreen />} />
         <Route path="/app/embarque/:id/facial" element={<SolicitarEmbarqueScreen />} />
@@ -98,7 +93,6 @@ export default function App() {
         <Route path="/app/avaliacao" element={<AvaliacaoScreen />} />
         <Route path="/app/viagem/:id" element={<ViagemDetalheScreen />} />
         <Route path="/app/perfil/editar" element={<EditarPerfilScreen />} />
-        <Route path="/app/aviso/:id" element={<AvisoDetalheScreen />} />
 
         {/* Operação / Motorista */}
         <Route element={<RotaProtegida perfil="motorista" />}>

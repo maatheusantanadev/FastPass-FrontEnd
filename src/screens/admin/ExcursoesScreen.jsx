@@ -8,31 +8,15 @@ import Badge from "../../components/Badge.jsx";
 import MethodPill from "../../components/MethodPill.jsx";
 import Avatar from "../../components/Avatar.jsx";
 import Button from "../../components/Button.jsx";
-import { passageiros as passageirosMock } from "../../data/passageiros.js";
-import { excursaoPorId } from "../../data/excursoes.js";
 import { painelExcursao, adicionarPassageiro } from "../../api/excursoes.js";
 import { excursaoDoBackend, passageirosDoPainel } from "../../api/adapters.js";
 import { formatBRL } from "../../utils/format.js";
 
-// Normaliza a lista mock para o mesmo formato do adapter do painel.
-function normalizarMock(p) {
-  return {
-    id: p.id,
-    nome: p.nome,
-    sub: `CPF ${p.cpf}`,
-    pagamento: p.pagamento,
-    embarque: p.status === "embarcado",
-    metodo: p.metodo,
-  };
-}
-
 export default function ExcursoesScreen() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [excursao, setExcursao] = useState(() => excursaoPorId(id));
-  const [passageiros, setPassageiros] = useState(() =>
-    passageirosMock.map(normalizarMock)
-  );
+  const [excursao, setExcursao] = useState(null);
+  const [passageiros, setPassageiros] = useState([]);
 
   // Form "adicionar passageiro"
   const [adicionando, setAdicionando] = useState(false);
@@ -73,7 +57,8 @@ export default function ExcursoesScreen() {
 
   const confirmados = passageiros.filter((p) => p.pagamento === "pago").length;
   const aReceber =
-    passageiros.filter((p) => p.pagamento === "pendente").length * excursao.preco;
+    passageiros.filter((p) => p.pagamento === "pendente").length *
+    (excursao?.preco ?? 0);
 
   const columns = [
     {
@@ -141,12 +126,12 @@ export default function ExcursoesScreen() {
 
   return (
     <DashboardShell
-      title={excursao.destino}
-      subtitle={`${excursao.data} · ${excursao.empresa}`}
+      title={excursao?.destino ?? "Excursão"}
+      subtitle={excursao ? `${excursao.data} · ${excursao.empresa}` : ""}
       actions={<div className="hidden gap-2 sm:flex">{acoes}</div>}
     >
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <KPI label="Capacidade" value={`${excursao.total} lugares`} icon={Users} />
+        <KPI label="Capacidade" value={`${excursao?.total ?? 0} lugares`} icon={Users} />
         <KPI label="Confirmados" value={confirmados} icon={CheckCircle2} tone="cobalt" />
         <KPI label="A receber" value={formatBRL(aReceber)} icon={Wallet} sub="pagamentos pendentes" />
       </div>

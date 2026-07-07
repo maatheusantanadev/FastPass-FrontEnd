@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, Bus, Clock, Users, Building2 } from "lucide-react";
 import Scene from "../../components/Scene.jsx";
 import Button from "../../components/Button.jsx";
-import { excursaoPorId } from "../../data/excursoes.js";
 import { usePedido } from "../../context/PedidoContext.jsx";
 import { obterExcursao } from "../../api/excursoes.js";
 import { excursaoDoBackend } from "../../api/adapters.js";
@@ -25,8 +24,7 @@ export default function DetalhesScreen() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { setExcursao } = usePedido();
-  // Começa pelo mock (resposta imediata) e corrige com a API quando disponível.
-  const [excursao, setExcursaoLocal] = useState(() => excursaoPorId(id));
+  const [excursao, setExcursaoLocal] = useState(null);
 
   useEffect(() => {
     let vivo = true;
@@ -43,6 +41,22 @@ export default function DetalhesScreen() {
   function comprar() {
     setExcursao(excursao);
     navigate("/app/assentos");
+  }
+
+  if (!excursao) {
+    return (
+      <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-white text-muted sm:mx-auto sm:my-6 sm:min-h-[calc(100dvh-3rem)] sm:max-h-[924px] sm:w-[430px] sm:rounded-[34px] sm:shadow-phone">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          aria-label="Voltar"
+          className="tap-target absolute left-3 top-[max(0.75rem,env(safe-area-inset-top))] flex items-center justify-center rounded-full bg-white/90 text-ink shadow-card"
+        >
+          <ChevronLeft size={22} />
+        </button>
+        <p className="text-[15px]">Carregando excursão…</p>
+      </div>
+    );
   }
 
   return (

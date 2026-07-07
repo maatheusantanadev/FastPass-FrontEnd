@@ -15,12 +15,12 @@ export default function AssentosScreen() {
 
   function confirmar() {
     setAssento(selecionado);
-    navigate("/app/passeios");
+    navigate("/app/resumo");
   }
 
   return (
     <MobileShell
-      header={<AppHeader title="Escolha seu assento" subtitle={excursao.destino} />}
+      header={<AppHeader title="Escolha seu assento" subtitle={excursao?.destino} />}
       footer={
         <div className="flex items-center gap-4 border-t border-line px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <div className="min-w-[92px]">

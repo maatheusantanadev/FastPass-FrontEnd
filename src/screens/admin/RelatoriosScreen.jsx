@@ -4,13 +4,11 @@ import DashboardShell from "../../components/DashboardShell.jsx";
 import KPI from "../../components/KPI.jsx";
 import DataTable from "../../components/DataTable.jsx";
 import Button from "../../components/Button.jsx";
-import {
-  historicoViagens as historicoMock,
-  kpisRelatorios as kpisMock,
-} from "../../data/relatorios.js";
 import { obterDashboard } from "../../api/dashboard.js";
 import { dashboardDoBackend } from "../../api/adapters.js";
 import { formatBRL, pct } from "../../utils/format.js";
+
+const KPIS_VAZIO = { presencaMedia: 0, atrasos: 0, ocupacao: 0, viagensMes: 0 };
 
 function BarraMini({ valor }) {
   return (
@@ -24,10 +22,10 @@ function BarraMini({ valor }) {
 }
 
 export default function RelatoriosScreen() {
-  const [k, setK] = useState(kpisMock);
-  const [historicoViagens, setHistorico] = useState(historicoMock);
+  const [k, setK] = useState(KPIS_VAZIO);
+  const [historicoViagens, setHistorico] = useState([]);
 
-  // Carrega os relatórios reais; mantém o mock se o backend estiver offline.
+  // Carrega os relatórios reais do backend.
   useEffect(() => {
     let vivo = true;
     obterDashboard()

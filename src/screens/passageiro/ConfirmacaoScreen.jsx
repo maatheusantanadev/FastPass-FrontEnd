@@ -7,7 +7,6 @@ import QRCode from "../../components/QRCode.jsx";
 import Button from "../../components/Button.jsx";
 import { usePedido } from "../../context/PedidoContext.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { usuario } from "../../data/passageiros.js";
 import { formatBRL } from "../../utils/format.js";
 
 export default function ConfirmacaoScreen() {
@@ -15,9 +14,9 @@ export default function ConfirmacaoScreen() {
   const { excursao, assento, totais, compra } = usePedido();
   const { usuario: authUser } = useAuth();
 
-  const nome = authUser?.name ?? usuario.nomeCompleto;
+  const nome = authUser?.name ?? "Passageiro";
   const totalPago = compra ? Number(compra.valor) : totais.total;
-  const qrValue = compra?.codigo_qr ?? `FASTPASS|${usuario.codigoEmbarque}|${excursao.id}`;
+  const qrValue = compra?.codigo_qr ?? null;
 
   return (
     <MobileShell
@@ -43,7 +42,7 @@ export default function ConfirmacaoScreen() {
           Compra confirmada!
         </motion.h1>
         <p className="mt-2 text-[15px] text-muted">
-          {excursao.destino} · {excursao.data}
+          {excursao?.destino} · {excursao?.data}
         </p>
 
         <div className="mt-6 w-full rounded-2xl border border-line bg-cobalt-tint/30 p-4 text-left text-[14px]">
@@ -61,9 +60,11 @@ export default function ConfirmacaoScreen() {
           </div>
         </div>
 
-        <div className="mt-6">
-          <QRCode value={qrValue} size={188} label="Bilhete de embarque" />
-        </div>
+        {qrValue && (
+          <div className="mt-6">
+            <QRCode value={qrValue} size={188} label="Bilhete de embarque" />
+          </div>
+        )}
       </div>
     </MobileShell>
   );

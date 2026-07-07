@@ -5,18 +5,25 @@ import DashboardShell from "../../components/DashboardShell.jsx";
 import KPI from "../../components/KPI.jsx";
 import BarChart from "../../components/BarChart.jsx";
 import Donut from "../../components/Donut.jsx";
-import { vendasPorDia as vendasMock, kpisVisaoGeral as kpisMock } from "../../data/relatorios.js";
 import { obterDashboard } from "../../api/dashboard.js";
 import { dashboardDoBackend } from "../../api/adapters.js";
 import { formatBRL, pct } from "../../utils/format.js";
 
+const KPIS_VAZIO = {
+  vagasOcupadas: 0,
+  capacidade: 0,
+  confirmados: 0,
+  pagamentos: 0,
+  ocupacaoMedia: 0,
+};
+
 export default function VisaoGeralScreen() {
   const navigate = useNavigate();
-  const [k, setK] = useState(kpisMock);
-  const [vendasPorDia, setVendas] = useState(vendasMock);
-  const [excursaoAtual, setExcursaoAtual] = useState("Praia do Forte");
+  const [k, setK] = useState(KPIS_VAZIO);
+  const [vendasPorDia, setVendas] = useState([]);
+  const [excursaoAtual, setExcursaoAtual] = useState(null);
 
-  // Carrega as métricas reais; mantém o mock se o backend estiver offline.
+  // Carrega as métricas reais do backend.
   useEffect(() => {
     let vivo = true;
     obterDashboard()
@@ -24,8 +31,8 @@ export default function VisaoGeralScreen() {
         if (!vivo || !d) return;
         const dash = dashboardDoBackend(d);
         setK(dash.kpisVisaoGeral);
-        if (dash.vendasPorDia.length) setVendas(dash.vendasPorDia);
-        if (dash.excursaoAtual) setExcursaoAtual(dash.excursaoAtual);
+        setVendas(dash.vendasPorDia);
+        setExcursaoAtual(dash.excursaoAtual);
       })
       .catch(() => {});
     return () => {
@@ -50,7 +57,9 @@ export default function VisaoGeralScreen() {
             <Radio size={18} /> Embarque em andamento
           </p>
           <p className="text-[13px] text-white/70">
-            {excursaoAtual} · acompanhe a validação em tempo real
+            {excursaoAtual
+              ? `${excursaoAtual} · acompanhe a validação em tempo real`
+              : "acompanhe a validação em tempo real"}
           </p>
         </div>
         <ArrowRight size={20} />

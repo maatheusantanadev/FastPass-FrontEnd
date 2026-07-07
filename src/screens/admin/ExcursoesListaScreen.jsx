@@ -5,7 +5,6 @@ import DashboardShell from "../../components/DashboardShell.jsx";
 import DataTable from "../../components/DataTable.jsx";
 import Badge from "../../components/Badge.jsx";
 import Button from "../../components/Button.jsx";
-import { excursoes as excursoesMock } from "../../data/excursoes.js";
 import { listarExcursoes } from "../../api/excursoes.js";
 import { excursaoDoBackend } from "../../api/adapters.js";
 import { formatBRL, pct } from "../../utils/format.js";
@@ -24,13 +23,13 @@ function OcupacaoBar({ ocupadas, total }) {
 
 export default function ExcursoesListaScreen() {
   const navigate = useNavigate();
-  const [excursoes, setExcursoes] = useState(excursoesMock);
+  const [excursoes, setExcursoes] = useState([]);
 
   useEffect(() => {
     let vivo = true;
     listarExcursoes()
       .then((lista) => {
-        if (vivo && Array.isArray(lista) && lista.length) {
+        if (vivo && Array.isArray(lista)) {
           setExcursoes(lista.map(excursaoDoBackend));
         }
       })
