@@ -6,12 +6,11 @@ import Avatar from "../../components/Avatar.jsx";
 import MethodPill from "../../components/MethodPill.jsx";
 import Button from "../../components/Button.jsx";
 import { useOperacao } from "../../context/OperacaoContext.jsx";
-import { resumoOperacao } from "../../data/passageiros.js";
 
 export default function ValidacaoAprovadoScreen() {
   const navigate = useNavigate();
   const { ultimo, contagem, total, excursaoNome } = useOperacao();
-  const destino = excursaoNome ?? resumoOperacao.excursao;
+  const destino = excursaoNome ?? "Viagem em andamento";
 
   const p = ultimo ?? {
     nome: "Passageiro",

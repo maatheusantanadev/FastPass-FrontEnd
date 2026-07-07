@@ -7,22 +7,22 @@ import KPI from "../../components/KPI.jsx";
 import Scene from "../../components/Scene.jsx";
 import Button from "../../components/Button.jsx";
 import { useOperacao } from "../../context/OperacaoContext.jsx";
-import { resumoOperacao } from "../../data/passageiros.js";
-import { listarExcursoes } from "../../api/excursoes.js";
+import { listarExcursoesMotorista } from "../../api/motorista.js";
+import { dataCurta, hora } from "../../api/adapters.js";
 
 export default function OperacaoScreen() {
   const navigate = useNavigate();
-  const { total, contagem, excursaoId, setExcursaoId } = useOperacao();
+  const { total, contagem, excursaoId, setExcursaoId, excursaoAtual, erro } = useOperacao();
 
-  // Define a excursão real em operação (primeira disponível) para que a
-  // validação facial tenha um alvo no backend. Sem backend, segue simulado.
+  // Ao entrar sem viagem selecionada, escolhe a próxima viagem atribuída ao
+  // motorista autenticado (vinda do banco, via /motorista/excursoes).
   useEffect(() => {
     if (excursaoId) return;
     let vivo = true;
-    listarExcursoes()
-      .then((lista) => {
-        if (vivo && Array.isArray(lista) && lista.length) {
-          setExcursaoId(lista[0].id);
+    listarExcursoesMotorista()
+      .then((viagens) => {
+        if (vivo && Array.isArray(viagens) && viagens.length) {
+          setExcursaoId(viagens[0].id);
         }
       })
       .catch(() => {});
@@ -42,10 +42,22 @@ export default function OperacaoScreen() {
       }
       footer={
         <div className="flex flex-col gap-2 border-t border-line px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-          <Button variant="primary" icon={ScanFace} fullWidth onClick={() => navigate("/operacao/facial")}>
+          <Button
+            variant="primary"
+            icon={ScanFace}
+            fullWidth
+            disabled={!excursaoId}
+            onClick={() => navigate("/operacao/facial")}
+          >
             Iniciar embarque
           </Button>
-          <Button variant="soft" icon={ClipboardCheck} fullWidth onClick={() => navigate("/operacao/manual")}>
+          <Button
+            variant="soft"
+            icon={ClipboardCheck}
+            fullWidth
+            disabled={!excursaoId}
+            onClick={() => navigate("/operacao/manual")}
+          >
             Conferência manual
           </Button>
         </div>
@@ -70,20 +82,30 @@ export default function OperacaoScreen() {
                 Trocar
               </button>
             </div>
-            <h1 className="mt-0.5 font-display text-[22px] font-medium text-ink">
-              {resumoOperacao.excursao}
-            </h1>
-            <div className="mt-3 flex flex-col gap-1.5 text-[13px] text-muted">
-              <span className="inline-flex items-center gap-2">
-                <Clock size={14} className="text-cobalt" /> {resumoOperacao.data} · saída {resumoOperacao.saida}
-              </span>
-              <span className="inline-flex items-center gap-2">
-                <Bus size={14} className="text-cobalt" /> {resumoOperacao.onibus}
-              </span>
-              <span className="inline-flex items-center gap-2">
-                <Users size={14} className="text-cobalt" /> {resumoOperacao.capacidade} poltronas
-              </span>
-            </div>
+
+            {excursaoAtual ? (
+              <>
+                <h1 className="mt-0.5 font-display text-[22px] font-medium text-ink">
+                  {excursaoAtual.destino ?? excursaoAtual.titulo}
+                </h1>
+                <div className="mt-3 flex flex-col gap-1.5 text-[13px] text-muted">
+                  <span className="inline-flex items-center gap-2">
+                    <Clock size={14} className="text-cobalt" />{" "}
+                    {dataCurta(excursaoAtual.data_saida)} · saída {hora(excursaoAtual.data_saida)}
+                  </span>
+                  <span className="inline-flex items-center gap-2">
+                    <Bus size={14} className="text-cobalt" /> {excursaoAtual.titulo}
+                  </span>
+                  <span className="inline-flex items-center gap-2">
+                    <Users size={14} className="text-cobalt" /> {excursaoAtual.vagas_total} poltronas
+                  </span>
+                </div>
+              </>
+            ) : (
+              <p className="mt-2 text-[14px] text-muted">
+                {erro ?? "Nenhuma viagem atribuída a você no momento."}
+              </p>
+            )}
           </div>
         </div>
 

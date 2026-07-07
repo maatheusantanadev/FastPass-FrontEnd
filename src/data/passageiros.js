@@ -25,25 +25,3 @@ export const usuario = {
   pontos: 150,
   codigoEmbarque: "FP-7K2M-9QX4",
 };
-
-export const resumoOperacao = {
-  excursao: "Praia do Forte",
-  data: "15 jul, sáb",
-  saida: "06:30",
-  capacidade: 33,
-  onibus: "Leito · Placa OGT-2B47",
-  motorista: "Sr. Antônio",
-};
-
-export function contarStatus(lista) {
-  return lista.reduce(
-    (acc, p) => {
-      if (p.status === "embarcado") acc.embarcados += 1;
-      else if (p.status === "pendente") acc.pendentes += 1;
-      else if (p.status === "ausente") acc.ausentes += 1;
-      if (p.pagamento === "pago") acc.confirmados += 1;
-      return acc;
-    },
-    { embarcados: 0, pendentes: 0, ausentes: 0, confirmados: 0 }
-  );
-}

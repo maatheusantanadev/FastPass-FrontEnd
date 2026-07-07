@@ -11,6 +11,8 @@ import { useOperacao } from "../../context/OperacaoContext.jsx";
 export default function ConferenciaManualScreen() {
   const { lista, total, contagem, embarcar } = useOperacao();
   const [busca, setBusca] = useState("");
+  const [confirmandoId, setConfirmandoId] = useState(null);
+  const [erro, setErro] = useState(null);
 
   const filtrada = useMemo(() => {
     const q = busca.trim().toLowerCase();
@@ -19,6 +21,18 @@ export default function ConferenciaManualScreen() {
       (p) => p.nome.toLowerCase().includes(q) || p.cpf.includes(q)
     );
   }, [lista, busca]);
+
+  async function confirmar(id) {
+    setConfirmandoId(id);
+    setErro(null);
+    try {
+      await embarcar("manual", id);
+    } catch (err) {
+      setErro(err.message || "Não foi possível confirmar o embarque.");
+    } finally {
+      setConfirmandoId(null);
+    }
+  }
 
   return (
     <MobileShell
@@ -41,6 +55,10 @@ export default function ConferenciaManualScreen() {
         </div>
       </div>
 
+      {erro && (
+        <p className="px-5 pb-2 text-[13px] font-medium text-danger">{erro}</p>
+      )}
+
       <ul className="divide-y divide-line px-5 pb-6">
         {filtrada.map((p) => {
           const embarcado = p.status === "embarcado";
@@ -61,10 +79,11 @@ export default function ConferenciaManualScreen() {
               ) : (
                 <Button
                   variant="soft"
-                  onClick={() => embarcar("manual", p.id)}
+                  disabled={confirmandoId === p.id}
+                  onClick={() => confirmar(p.id)}
                   className="px-4 py-2 text-[13px]"
                 >
-                  Confirmar
+                  {confirmandoId === p.id ? "Confirmando…" : "Confirmar"}
                 </Button>
               )}
             </li>

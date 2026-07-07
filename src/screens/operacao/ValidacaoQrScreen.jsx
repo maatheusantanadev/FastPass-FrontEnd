@@ -8,11 +8,12 @@ import { embarcarPorQrCode } from "../../api/embarque.js";
 
 export default function ValidacaoQrScreen() {
   const navigate = useNavigate();
-  const { total, contagem, embarcar, registrarEmbarque } = useOperacao();
+  const { total, contagem, registrarEmbarque } = useOperacao();
   const { videoRef, iniciar, parar, disponivel } = useCamera({
     facingMode: "environment",
   });
   const [lendo, setLendo] = useState(false);
+  const [erro, setErro] = useState(null);
   const lendoRef = useRef(false);
   const timer = useRef(null);
 
@@ -20,31 +21,29 @@ export default function ValidacaoQrScreen() {
     if (lendoRef.current) return;
     lendoRef.current = true;
     setLendo(true);
+    setErro(null);
     try {
       const res = await embarcarPorQrCode(codigo); // POST /embarque/qrcode
-      if (res?.compra) registrarEmbarque(res.compra, "qr");
-      else embarcar("qr");
+      registrarEmbarque(res.compra, "qr");
       parar();
       navigate("/operacao/aprovado");
-    } catch (err) {
-      if (err.offline) {
-        embarcar("qr");
-        parar();
-        navigate("/operacao/aprovado");
-      } else {
-        navigate("/operacao/nao-identificado");
-      }
+    } catch {
+      navigate("/operacao/nao-identificado");
     } finally {
       lendoRef.current = false;
       setLendo(false);
     }
   }
 
-  // Câmera + leitura real de QR (BarcodeDetector). Sem suporte, o toque simula.
+  // Câmera + leitura real de QR (BarcodeDetector).
   useEffect(() => {
     let ativo = true;
     iniciar().then((ok) => {
-      if (!ativo || !ok || !("BarcodeDetector" in window)) return;
+      if (!ativo || !ok) return;
+      if (!("BarcodeDetector" in window)) {
+        setErro("Leitor de QR Code não suportado neste navegador.");
+        return;
+      }
       const detector = new window.BarcodeDetector({ formats: ["qr_code"] });
       timer.current = setInterval(async () => {
         if (!ativo || lendoRef.current || !videoRef.current?.videoWidth) return;
@@ -65,31 +64,14 @@ export default function ValidacaoQrScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Fallback (sem câmera/scanner): o toque simula a leitura (demonstração).
-  function simular() {
-    if (lendoRef.current) return;
-    lendoRef.current = true;
-    setLendo(true);
-    timer.current = setTimeout(() => {
-      embarcar("qr");
-      navigate("/operacao/aprovado");
-    }, 1200);
-  }
-
   return (
     <CameraLayout
       modo="qr"
       embarcados={contagem.embarcados}
       total={total}
-      legenda={lendo ? "Lendo o código…" : "Aproxime o QR Code do passageiro"}
+      legenda={erro ? erro : lendo ? "Lendo o código…" : "Aproxime o QR Code do passageiro"}
     >
-      <ScanFrame
-        variant="qr"
-        scanning
-        onCapture={disponivel ? undefined : simular}
-        size={272}
-        videoRef={videoRef}
-      />
+      <ScanFrame variant="qr" scanning size={272} videoRef={videoRef} />
     </CameraLayout>
   );
 }

@@ -1,10 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { BarChart3 } from "lucide-react";
 import SuccessCheck from "../../components/SuccessCheck.jsx";
 import Button from "../../components/Button.jsx";
 import { useOperacao } from "../../context/OperacaoContext.jsx";
-import { resumoOperacao } from "../../data/passageiros.js";
 
 function Resumo({ label, value, tone = "text-ink" }) {
   return (
@@ -17,7 +15,7 @@ function Resumo({ label, value, tone = "text-ink" }) {
 
 export default function EmbarqueConcluidoScreen() {
   const navigate = useNavigate();
-  const { contagem, total, reiniciar } = useOperacao();
+  const { contagem, total, excursaoNome, reiniciar } = useOperacao();
   const ausentes = total - contagem.embarcados;
 
   return (
@@ -32,21 +30,11 @@ export default function EmbarqueConcluidoScreen() {
         >
           Embarque encerrado
         </motion.h1>
-        <p className="mt-2 text-[15px] text-muted">{resumoOperacao.excursao}</p>
+        <p className="mt-2 text-[15px] text-muted">{excursaoNome ?? "Viagem"}</p>
 
         <div className="mt-8 grid w-full grid-cols-2 gap-3">
           <Resumo label="Embarcados" value={contagem.embarcados} tone="text-success" />
           <Resumo label="Ausentes" value={ausentes} tone="text-danger" />
-        </div>
-        <div className="mt-3 w-full rounded-2xl bg-cobalt-tint/50 px-4 py-3 text-[14px] text-ink">
-          <div className="flex justify-between">
-            <span className="text-muted">Início</span>
-            <span className="font-medium">06:12</span>
-          </div>
-          <div className="mt-1 flex justify-between">
-            <span className="text-muted">Fim</span>
-            <span className="font-medium">06:34</span>
-          </div>
         </div>
       </div>
 
@@ -60,9 +48,6 @@ export default function EmbarqueConcluidoScreen() {
           }}
         >
           Liberar saída
-        </Button>
-        <Button variant="ghost" icon={BarChart3} fullWidth onClick={() => navigate("/painel/validacao")}>
-          Ver no painel
         </Button>
       </div>
     </div>

@@ -8,11 +8,12 @@ import { embarcarPorFacial } from "../../api/embarque.js";
 
 export default function ValidacaoFacialScreen() {
   const navigate = useNavigate();
-  const { total, contagem, embarcar, registrarEmbarque, excursaoId } = useOperacao();
+  const { total, contagem, registrarEmbarque, excursaoId } = useOperacao();
   const { videoRef, iniciar, parar, capturar, disponivel } = useCamera({
     facingMode: "environment",
   });
   const [lendo, setLendo] = useState(false);
+  const [erro, setErro] = useState(null);
   const timer = useRef(null);
 
   useEffect(() => {
@@ -25,34 +26,28 @@ export default function ValidacaoFacialScreen() {
 
   async function ler() {
     if (lendo) return;
-    setLendo(true);
 
-    const imagem = disponivel ? capturar() : null;
-
-    // Sem câmera ou sem excursão real selecionada: modo simulado.
-    if (!imagem || !excursaoId) {
-      timer.current = setTimeout(() => {
-        embarcar("facial");
-        setLendo(false);
-        navigate("/operacao/aprovado");
-      }, 1600);
+    if (!excursaoId) {
+      setErro("Nenhuma viagem selecionada. Volte e escolha a viagem em operação.");
       return;
     }
 
+    const imagem = disponivel ? capturar() : null;
+    if (!imagem) {
+      setErro("Câmera não disponível neste dispositivo.");
+      return;
+    }
+
+    setErro(null);
+    setLendo(true);
     try {
       const res = await embarcarPorFacial(excursaoId, imagem); // POST /embarque/facial
-      if (res?.compra) registrarEmbarque(res.compra, "facial");
-      else embarcar("facial");
+      registrarEmbarque(res.compra, "facial");
       parar();
       navigate("/operacao/aprovado");
-    } catch (err) {
-      if (err.offline) {
-        embarcar("facial");
-        navigate("/operacao/aprovado");
-      } else {
-        // Passageiro não reconhecido (404) ou outro erro.
-        navigate("/operacao/nao-identificado");
-      }
+    } catch {
+      // Passageiro não reconhecido (404) ou outro erro do backend.
+      navigate("/operacao/nao-identificado");
     } finally {
       setLendo(false);
     }
@@ -64,7 +59,9 @@ export default function ValidacaoFacialScreen() {
       embarcados={contagem.embarcados}
       total={total}
       legenda={
-        lendo
+        erro
+          ? erro
+          : lendo
           ? "Lendo o rosto do passageiro…"
           : "Aponte a câmera para o rosto do passageiro"
       }
@@ -74,7 +71,7 @@ export default function ValidacaoFacialScreen() {
           onClick={() => navigate("/operacao/nao-identificado")}
           className="mt-4 text-[13px] font-medium text-white/50 underline underline-offset-4"
         >
-          simular falha
+          usar outro método
         </button>
       }
     >

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ScanFace } from "lucide-react";
 import MobileShell from "../../components/MobileShell.jsx";
@@ -18,7 +18,9 @@ function Metric({ label, value, tone }) {
 
 export default function ListaEmbarqueScreen() {
   const navigate = useNavigate();
-  const { lista, total, contagem, carregarPainel } = useOperacao();
+  const { lista, total, contagem, carregarPainel, encerrarEmbarque } = useOperacao();
+  const [encerrando, setEncerrando] = useState(false);
+  const [erro, setErro] = useState(null);
   const pct = total ? Math.round((contagem.embarcados / total) * 100) : 0;
 
   // Re-sincroniza com o backend ao abrir (contadores/embarques atualizados).
@@ -26,6 +28,19 @@ export default function ListaEmbarqueScreen() {
     carregarPainel();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  async function encerrar() {
+    setEncerrando(true);
+    setErro(null);
+    try {
+      await encerrarEmbarque();
+      navigate("/operacao/fim");
+    } catch (err) {
+      setErro(err.message || "Não foi possível encerrar o embarque.");
+    } finally {
+      setEncerrando(false);
+    }
+  }
 
   // embarcados primeiro (mais recentes no topo), depois pendentes/ausentes
   const ordenada = [...lista].sort((a, b) => {
@@ -41,8 +56,8 @@ export default function ListaEmbarqueScreen() {
           <Button variant="primary" icon={ScanFace} fullWidth onClick={() => navigate("/operacao/facial")}>
             Continuar validando
           </Button>
-          <Button variant="soft" fullWidth onClick={() => navigate("/operacao/fim")}>
-            Encerrar embarque
+          <Button variant="soft" fullWidth disabled={encerrando} onClick={encerrar}>
+            {encerrando ? "Encerrando…" : "Encerrar embarque"}
           </Button>
         </div>
       }
@@ -51,6 +66,10 @@ export default function ListaEmbarqueScreen() {
         <h1 className="mb-4 font-display text-[20px] font-medium text-ink">
           Lista de embarque
         </h1>
+
+        {erro && (
+          <p className="mb-3 text-[13px] font-medium text-danger">{erro}</p>
+        )}
 
         {/* progresso */}
         <div className="rounded-2xl border border-line bg-white p-4">
